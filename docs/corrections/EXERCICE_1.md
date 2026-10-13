@@ -1,5 +1,7 @@
 # Correction de l’exercice 1 — Audit de l’API
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Avant l’ajout de Spring Security, toutes les routes métier sont ouvertes. Un visiteur peut lire l’information publique et les tâches, mais aussi créer, modifier, terminer ou supprimer une tâche et consulter les statistiques d’administration.
 
 | Méthode et route | Réponse anonyme | Politique souhaitée | Problème constaté |
