@@ -1,5 +1,7 @@
 # TP progressif — Spring Security et API de gestion de tâches
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Le dépôt contient une API Spring Boot et son client React, Planora. Le client métier est déjà en place : les étudiants font évoluer l’authentification et les autorisations du backend, en six étapes, tout en utilisant une vraie application.
 
 ## Démarrer

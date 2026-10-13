@@ -1,5 +1,7 @@
 # Exercice 5 — Protéger une méthode avec @PreAuthorize (10 min)
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 **Branche :** `Tp_version5`
 **Fichiers à modifier :** `src/main/java/fr/tpspringsecurity/controller/TaskController.java` et `src/main/java/fr/tpspringsecurity/config/SecurityConfig.java`.
 

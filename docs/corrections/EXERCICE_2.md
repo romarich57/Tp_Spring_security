@@ -1,5 +1,7 @@
 # Correction de l'exercice 2 — Activer Spring Security
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 La dépendance à ajouter à `pom.xml` est :
 
 ```xml
