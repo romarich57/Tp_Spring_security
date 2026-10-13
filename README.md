@@ -1,25 +1,26 @@
-# TP Spring Security — Version 3 / 6
+# TP Spring Security — Version 4 / 6
 
-**Exercice 3 : ajouter Alice et Bob avec un PasswordEncoder.**
+**Exercice 4 : donner à chaque endpoint sa politique d'accès.**
 
-Cette branche contient les corrections des exercices 1 à 2, et le code **avant** la résolution de l'exercice 3.
+Cette branche est un point de reprise autonome. Elle inclut toutes les solutions antérieures, **mais pas celle de l'exercice en cours** (sauf la version 6, intégralement corrigée).
 
 ## Démarrage
 
-Pré-requis : **Java 17+**, **Maven 3.6.3+**, curl ou Postman.
+Java 17+, Maven 3.6.3+, terminal et Postman ou curl.
 
 ```bash
 git clone https://github.com/romarich57/Tp_Spring_security.git
 cd Tp_Spring_security
-git switch Tp_version3
+git switch Tp_version4
 mvn clean test
 mvn spring-boot:run
 ```
 
-- [Consignes de l'étape](ENONCE.md)
-- [Plan complet](docs/PLAN_DU_TP.md)
-- [Guide de test HTTP](docs/GUIDE_HTTP.md)
-- Corrections précédentes : `docs/corrections/`.
-- Requêtes : `requests.http`.
+- [Consignes](ENONCE.md)
+- [Plan de progression](docs/PLAN_DU_TP.md)
+- [Guide des appels HTTP](docs/GUIDE_HTTP.md)
+- [Corrections précédentes](docs/corrections/)
+- [Requêtes HTTP prêtes à l'emploi](requests.http)
 
-**Ne pas déployer en production.** Comptes et données entièrement fictifs.
+Comptes de démonstration : `alice / alice123` (USER), `bob / bob123` (ADMIN).
+**Local uniquement : ne pas utiliser ces identifiants ou HTTP Basic sans HTTPS en production.**

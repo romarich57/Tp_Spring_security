@@ -1,24 +1,18 @@
-# Exercice 3 — Configurer les utilisateurs (15 min)
+# Exercice 4 — Configurer les autorisations (10 minutes)
 
-La dépendance Spring Security est maintenant en place. L'application utilise volontairement la configuration par défaut de Spring Security, qui sécurise **tous** les endpoints.
+Les deux utilisateurs Alice (USER) et Bob (ADMIN) fonctionnent déjà. Mais Alice peut encore lire les statistiques ADMIN !
 
-## Objectif
+## Travail
 
-Remplacer le compte généré au démarrage par deux utilisateurs en mémoire :
+1. Ajoutez un Bean `SecurityFilterChain` dans `SecurityConfig`.
+2. Autorisez tout le monde sur `GET /api/public/info` avec `permitAll()`.
+3. Réservez `GET /api/admin/**` au rôle `ADMIN` avec `hasRole("ADMIN")`.
+4. Imposez une connexion sur toutes les autres requêtes avec `anyRequest().authenticated()`.
+5. Activez `httpBasic(withDefaults())`. Utilisez `SessionCreationPolicy.STATELESS` pour ce TP d'API HTTP Basic.
+6. Vérifiez 200, 401, 403 avec `curl` ou Postman.
 
-| Login | Mot de passe (démonstration locale) | Rôle |
-| --- | --- | --- |
-| `alice` | `alice123` | `USER` |
-| `bob` | `bob123` | `ADMIN` |
+**Conseil :** l'ordre des `requestMatchers` compte ; placez les règles spécifiques avant `anyRequest()`.
 
-## Tâches
+Les tests de cette branche démontrent volontairement le problème (Alice accède encore aux stats). Les résultats de sécurité souhaités figurent dans [le plan](docs/PLAN_DU_TP.md).
 
-1. Dans `src/main/java/fr/tpspringsecurity/config/SecurityConfig.java`, déclarez un Bean `PasswordEncoder` utilisant `BCryptPasswordEncoder`.
-2. Déclarez un Bean `UserDetailsService` de type `InMemoryUserDetailsManager`.
-3. Créez Alice et Bob avec `User.withUsername(...).password(encoder.encode(...)).roles(...).build()`.
-4. Testez `curl -i -u alice:alice123 http://localhost:8080/api/tasks` puis les mêmes routes avec Bob.
-5. Expliquez pourquoi **les deux** utilisateurs peuvent accéder à `/api/admin/stats` à cette étape : l'authentification seule ne contrôle pas encore les rôles.
-
-Indication : ajoutez les deux Beans **sans** déclarer encore de `SecurityFilterChain`. La configuration HTTP par défaut reste applicable.
-
-**La correction de l'exercice 3 sera visible dans `Tp_version4`.**
+Correction dans la branche `Tp_version5`.

@@ -1,13 +1,34 @@
 package fr.tpspringsecurity.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-/**
- * Exercice 3 : ajouter ici les Beans PasswordEncoder et UserDetailsService.
- * Ne pas créer de SecurityFilterChain avant l'exercice 4.
- */
 @Configuration
 public class SecurityConfig {
-    // TODO exercice 3 : @Bean PasswordEncoder (BCrypt)
-    // TODO exercice 3 : @Bean UserDetailsService (Alice USER, Bob ADMIN)
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+        UserDetails alice = User.withUsername("alice")
+                .password(encoder.encode("alice123"))
+                .roles("USER")
+                .build();
+
+        UserDetails bob = User.withUsername("bob")
+                .password(encoder.encode("bob123"))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(alice, bob);
+    }
 }
