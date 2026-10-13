@@ -21,4 +21,6 @@ Remplacer le compte généré au démarrage par deux utilisateurs en mémoire :
 
 Indication : ajoutez les deux Beans **sans** déclarer encore de `SecurityFilterChain`. La configuration HTTP par défaut reste applicable.
 
+**Verification automatisee :** une fois les deux comptes crees, retirez `@Disabled` de `exercice3AliceEtBobPeuventSeConnecter` dans `TaskApiSecurityTest.java` puis lancez `mvn test`.
+
 **La correction de l'exercice 3 sera visible dans `Tp_version4`.**
