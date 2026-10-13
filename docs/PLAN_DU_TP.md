@@ -7,7 +7,7 @@ L’application Planora et son contrat de gestion des tâches sont déjà en pla
 | Tp_version1 | Observer les accès ouverts (10 min) | CRUD en mémoire et statistiques accessibles anonymement |
 | Tp_version2 | Ajouter Spring Security (10 min) | Protection automatique de toutes les routes |
 | Tp_version3 | Déclarer les comptes (15 min) | Alice USER, Bob ADMIN et mots de passe BCrypt |
-| Tp_version4 | Configurer les droits HTTP (10 min) | Tâches authentifiées, statistiques ADMIN, info publique |
+| Tp_version4 | Configurer les droits HTTP (10 min) | Tâches authentifiées, statistiques ADMIN, info publique et CSRF adapté à l’API stateless |
 | Tp_version5 | Protéger une méthode (10 min) | Note confidentielle réservée à ADMIN par @PreAuthorize |
 | Tp_version6 | Valider (5 min) | Implémentation complète et tests d’intégration |
 
@@ -57,3 +57,5 @@ Ces identifiants sont fictifs et destinés uniquement à l’exécution locale d
 | Note confidentielle | 401 | 403 | 200 |
 
 Les scénarios détaillés avant et après chaque exercice sont dans SCENARIOS_DE_TEST.md.
+
+À l’exercice 4, désactivez CSRF dans SecurityFilterChain : le client est une API stateless qui transmet HTTP Basic dans l’en-tête Authorization et n’utilise pas de cookie de session. Cela permet aux opérations POST, PUT, PATCH et DELETE authentifiées de fonctionner.
