@@ -1,8 +1,8 @@
-# TP Spring Security — Version 2 / 6
+# TP Spring Security — Version 3 / 6
 
-**Exercice 2 : installer et explorer la sécurité activée par défaut.**
+**Exercice 3 : ajouter Alice et Bob avec un PasswordEncoder.**
 
-Cette branche contient les corrections des exercices 1 à 1, et le code **avant** la résolution de l'exercice 2.
+Cette branche contient les corrections des exercices 1 à 2, et le code **avant** la résolution de l'exercice 3.
 
 ## Démarrage
 
@@ -11,7 +11,7 @@ Pré-requis : **Java 17+**, **Maven 3.6.3+**, curl ou Postman.
 ```bash
 git clone https://github.com/romarich57/Tp_Spring_security.git
 cd Tp_Spring_security
-git switch Tp_version2
+git switch Tp_version3
 mvn clean test
 mvn spring-boot:run
 ```
