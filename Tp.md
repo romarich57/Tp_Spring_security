@@ -327,7 +327,7 @@ curl -i -u alice:incorrect http://localhost:8080/api/tasks
 
 **Résultats à observer :** Alice et Bob obtiennent `200` sur les tâches et les statistiques ; le mauvais mot de passe reçoit `401`. Les statistiques répondent encore `200` pour Alice : son rôle est bien enregistré, mais aucune règle HTTP ne l’utilise encore. Le chemin `/admin/` ne réserve pas une route à un administrateur à lui seul.
 
-Les mutations peuvent répondre `403` même quand Alice ou Bob est authentifié. C’est la protection CSRF par défaut de cette étape, pas une conséquence de leur rôle. Ne changez pas CSRF ici ; l’exercice 4 configurerа les règles HTTP et le comportement des mutations.
+Les mutations peuvent répondre `403` même quand Alice ou Bob est authentifié. C’est la protection CSRF par défaut de cette étape, pas une conséquence de leur rôle. Ne changez pas CSRF ici ; l’exercice 4 configurera les règles HTTP et le comportement des mutations.
 
 ### TODO 3.5 — Activer le test fourni
 
