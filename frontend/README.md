@@ -1,91 +1,57 @@
-# Interface React — Spring Security Lab
+# Planora — interface du TP Spring Security
 
-Une **interface React/Vite** accompagne chacun des six exercices de ce TP. Elle effectue de **vraies requêtes** vers les endpoints Spring Boot et affiche les codes HTTP reçus. Aucun résultat n'est simulé.
+Planora est une application de gestion de tâches déjà fonctionnelle côté React. Le TP porte sur le backend Spring : les étudiants font évoluer l’authentification et les autorisations pendant que l’interface consomme la même API métier.
 
-## Démarrage (2 terminaux)
+## Démarrer
 
-**Terminal 1, dans la racine du dépôt :**
-```bash
-mvn spring-boot:run
-```
+Dans deux terminaux, depuis la racine du dépôt :
 
-**Terminal 2, dans la racine du dépôt :**
-```bash
-cd frontend
-npm install
-npm run dev
-```
+    mvn spring-boot:run
 
-Ouvrez **http://localhost:5173**. Il faut **Node.js 22 recommandé** (ou Node 20.19+) et Java 17+.
+    cd frontend
+    npm install
+    npm run dev
 
-Vite agit comme proxy : `http://localhost:5173/api/...` est retransmis à `http://127.0.0.1:8080/api/...`. Vous n'avez pas à modifier CORS ni la configuration de Spring Security. Cette séparation garantit que l'interface reste accessible même quand l'exercice 2 protège toutes les URLs Spring Boot par défaut.
+Ouvrez http://localhost:5173. Prérequis : Java 17+ et Node.js 20.19+.
 
-## Fonctionnalités
+Vite relaie les appels /api vers Spring Boot sur localhost:8080. L’interface et le backend se servent donc de la même origine dans le navigateur.
 
-- Une interface liée à la branche courante (`frontend/src/version.js`).
-- Des consignes et une checklist spécifiques à chaque exercice.
-- Les vraies requêtes **GET** contre les routes publiques, tâches, admin et (à partir de l'étape 5) confidentielles.
-- Un sélecteur d'identité : anonyme, Alice USER, Bob ADMIN, ou utilisateur personnalisé (par exemple `user` et le mot de passe généré dans la console de Spring Security).
-- La matrice des réponses HTTP pour **Anonyme**, **Alice** et **Bob**.
-- Les étapes GitHub et un bouton pour copier la commande `git switch Tp_versionN`.
+## Ce que l’application utilise
 
-## Répartition du travail
+- GET /api/tasks pour afficher les tâches.
+- POST /api/tasks pour créer une tâche.
+- PUT /api/tasks/{id} pour modifier son titre, sa description, son état, sa priorité ou son échéance.
+- PATCH /api/tasks/{id}/complete pour la terminer.
+- DELETE /api/tasks/{id} pour la supprimer.
+- GET /api/admin/stats pour afficher les indicateurs calculés à partir des tâches.
+- GET /api/tasks/confidential, disponible à partir de l’exercice 5, pour lire la note du projet.
 
-- **React** (dans `frontend/`) : affichage et construction des requêtes de test.
-- **Controllers Spring** : transport HTTP et routes.
-- **Services Spring** : données de démonstration.
-- **UserConfig** : utilisateurs en mémoire et BCrypt.
-- **SecurityConfig** : autorisations HTTP et méthodes.
+Les tâches sont conservées en mémoire par Spring. Elles sont réinitialisées au redémarrage du backend.
 
-**Ne modifiez pas React pour corriger une faille de sécurité** : les contrôles d'accès doivent être appliqués côté backend. Les étudiants modifient les fichiers indiqués dans `ENONCE.md`.
+## Connexion pédagogique
 
-## Sécurité
+Le formulaire transmet le nom et le mot de passe en HTTP Basic à chaque requête et les conserve uniquement dans l’état React. Ils ne sont écrits ni dans un cookie, ni dans localStorage ou sessionStorage. Le bouton de déconnexion efface l’état mémoire.
 
-Les comptes `alice/alice123` et `bob/bob123` sont fictifs. Les mots de passe ne sont conservés **qu'en mémoire React** (pas de cookies ni localStorage). Le navigateur envoie explicitement un en-tête HTTP Basic lors des requêtes d'essai. Ce montage sert uniquement à l'apprentissage en local, jamais à un usage en production.
+- Version 2 : utilisez user et le mot de passe temporaire affiché par Spring Boot.
+- Versions 3 à 6 : Alice (alice / alice123) a le rôle USER ; Bob (bob / bob123) a le rôle ADMIN.
 
-## Vérifier le frontend
+Les contrôles d’accès restent exclusivement dans Spring Security. L’interface affiche les réponses du serveur, dont 401 pour une authentification absente ou invalide et 403 quand le rôle ne suffit pas. En version 1, les identifiants ne sont pas encore vérifiés puisque l’API est ouverte.
 
-```bash
-cd frontend
-npm install
-npm test
-npm run build
-```
+## Parcours des branches
 
-La CI GitHub Actions exécute ces vérifications et `mvn verify` sur chaque branche.
+La même interface est présente dans les six branches. Les règles de l’API évoluent :
 
-## Passer à l'exercice suivant
+| Version | Comportement attendu après l’exercice |
+| --- | --- |
+| 1 | Tâches et statistiques accessibles sans connexion |
+| 2 | Spring Security par défaut demande une authentification |
+| 3 | Alice et Bob existent, mais tout compte authentifié peut accéder aux routes |
+| 4 | Tâches réservées aux comptes connectés, statistiques réservées à ADMIN |
+| 5 | La note confidentielle reçoit aussi une protection par méthode |
+| 6 | Parcours complet et tests d’intégration actifs |
 
-Un clic dans la navigation React ouvre le code GitHub, mais **ne change pas votre branche Git locale**.
+Après git switch, arrêtez puis relancez Spring Boot afin que la JVM charge le code de la branche sélectionnée.
 
-1. Arrêtez le backend et le serveur Vite (`Ctrl+C`).
-2. Depuis la racine, exécutez `git fetch origin` puis `git switch Tp_versionN` (remplacez N par la prochaine version).
-3. Redémarrez `mvn spring-boot:run` puis `cd frontend && npm run dev`.
-4. Rejouez les appels pour vérifier les nouveaux codes HTTP.
+## Contrat de tâche
 
-**Important :** changer de branche pendant que Java tourne ne recharge pas les classes déjà lancées. Vous risquez sinon d'observer l'interface de la nouvelle version contre le backend de l'ancienne version.
-
-## Comprendre les profils et réponses
-
-- Aux versions 1 à 3, Alice et Bob ne sont pas encore déclarés dans l'état initial du backend. Leurs boutons permettent de voir le comportement avant leur création.
-- À l'exercice 2, choisissez « Personnalisé » pour essayer `user` et le mot de passe affiché dans la console **après** l'ajout de Spring Security.
-- En version 5, la route `/api/tasks/confidential` est encore à créer : elle peut renvoyer **404** après authentification. Cela fait partie de l'exercice, ce n'est pas un bug React.
-- Les étiquettes « Cible » décrivent les droits **à obtenir**, non l'état actuel de sécurité.
-- Le témoin « Mode local » ne certifie pas que Spring Boot est démarré : les appels de test le déterminent réellement.
-
-Tableaux de référence : [docs/SCENARIOS_DE_TEST.md](../docs/SCENARIOS_DE_TEST.md).
-
-## Conserver votre code avant de changer de branche
-
-Après avoir corrigé un exercice, **enregistrez votre travail** avant `git switch`, sinon Git peut refuser le changement de branche à cause des fichiers modifiés.
-
-```bash
-# Depuis la racine du dépôt, sauvegarder votre résolution sur la branche actuelle
-git add -A
-git commit -m "solution personnelle de l'exercice"
-
-# Ensuite, arrêter les deux serveurs avec Ctrl+C puis passer à l'étape suivante
-git switch Tp_version2    # adapter le numero à l'exercice suivant
-```
-
-Si vous ne souhaitez pas créer de commit, vous pouvez utiliser `git stash push -u -m "sauvegarde TP"` avant le changement de branche. Une fois sur la branche suivante, **ne réappliquez pas automatiquement le stash** : il représente le code de l'exercice précédent.
+Une tâche contient id, title, description, status (TODO, IN_PROGRESS, DONE), priority (LOW, MEDIUM, HIGH), dueDate et assignee. Pour créer ou modifier une tâche, le formulaire envoie ces champs (les valeurs d’assignation absentes sont conservées par le serveur lors d’une modification).

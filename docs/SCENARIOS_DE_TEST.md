@@ -1,58 +1,44 @@
-# Scénarios de test — parcours complet
+# Scénarios de l’application
 
-Ce document distingue **l'état initial de chaque branche** de **l'état visé après réalisation de l'exercice**. L'interface React envoie de vraies requêtes et ne simule aucun résultat.
+La même interface React pilote les vraies opérations métier sur les six branches. Le backend change les réponses selon le travail de sécurité déjà effectué.
 
-| Branche | Situation initiale | Travail de l'étudiant | Résultat observable après correction |
-| --- | --- | --- | --- |
-| `Tp_version1` | Les trois GET renvoient 200 à un visiteur anonyme | Auditer les failles dans le Markdown | Aucune modification du backend |
-| `Tp_version2` | Tout est encore accessible (comme v1) | Ajouter la dépendance Spring Security | GET sans identité → 401 (toutes les routes) ; `user` + mot de passe généré → 200 |
-| `Tp_version3` | Spring Security protège toutes les routes ; seul le compte généré fonctionne | Configurer Alice, Bob et BCrypt | Alice et Bob se connectent et ont accès aux stats (pas encore de contrôle ADMIN) |
-| `Tp_version4` | Alice et Bob existent ; Alice accède encore aux stats ; route publique encore protégée | Implémenter `SecurityFilterChain` | Public anonyme → 200 ; stats avec Alice → 403 ; stats avec Bob → 200 |
-| `Tp_version5` | Règles HTTP corrigées ; route confidentielle pas encore implémentée | Ajouter endpoint, `@PreAuthorize` et `@EnableMethodSecurity` | Confidentiel : anonyme → 401, Alice → 403, Bob → 200 |
-| `Tp_version6` | Tous les exercices corrigés | Vérifier les comportements | Voir matrice finale ci-dessous |
+## Fonctionnalités métier
 
-**Particularité version 5 avant correction :** la requête vers `/api/tasks/confidential` est filtrée en premier par Spring Security : anonyme → 401. Un compte valide passe le filtre puis tombe sur une route absente → 404. Après le TODO, la méthode doit être protégée par l'annotation Java.
+| Action dans Planora | Requête vers Spring | Réponse habituelle |
+| --- | --- | --- |
+| Ouvrir la liste | GET /api/tasks | 200 et tableau JSON |
+| Créer | POST /api/tasks | 201 et tâche créée |
+| Modifier | PUT /api/tasks/{id} | 200 et tâche modifiée |
+| Terminer | PATCH /api/tasks/{id}/complete | 200 et tâche terminée |
+| Supprimer | DELETE /api/tasks/{id} | 204 |
+| Ouvrir les statistiques | GET /api/admin/stats | 200 et valeurs calculées |
+| Ouvrir le projet confidentiel | GET /api/tasks/confidential | Disponible en version 5 |
 
-## Matrice finale (version 6)
+Les tâches sont conservées en mémoire et réinitialisées au redémarrage de Spring Boot.
 
-| GET | Anonyme | Alice USER | Bob ADMIN |
-| --- | --- | --- | --- |
-| `/api/public/info` | 200 | 200 | 200 |
-| `/api/tasks` | 401 | 200 | 200 |
-| `/api/admin/stats` | 401 | 403 | 200 |
-| `/api/tasks/confidential` | 401 | 403 | 200 |
+## Codes d’accès attendus après chaque exercice
 
-## Tests de validation
+| Route | Version 1 | Version 2 | Version 3 | Version 4 | Version 5/6 |
+| --- | --- | --- | --- | --- | --- |
+| GET /api/public/info | 200 anonyme | 401 avant correction, puis 200 | 401 avant correction, puis 200 | 200 anonyme | 200 anonyme |
+| /api/tasks et opérations | Accès anonyme | 401 avant correction, puis authentifié | Authentifié, tous les comptes | Authentifié | Authentifié |
+| GET /api/admin/stats | Accès anonyme | 401 avant correction, puis authentifié | Tout compte authentifié | ADMIN seulement | ADMIN seulement |
+| GET /api/tasks/confidential | 404 | 404 | 404 | 404 | Alice 403, Bob 200 après correction |
 
-Le projet initial doit **compiler et passer** `mvn test` dans chaque branche. Pour ne pas casser l'état initial, les nouveaux tests de l'exercice à faire sont d'abord marqués `@Disabled`.
+En version 2, Spring Security protège toutes les routes par défaut : une fois la dépendance ajoutée, même l’information publique demande une authentification jusqu’à l’exercice 4.
 
-1. Corriger les TODO dans le code Java.
-2. Retirer `@Disabled` du test correspondant à l'exercice (versions 2, 3, 4 et 5).
-3. Relancer `mvn test`.
-4. Vérifier avec la matrice de l'interface React.
+## Matrice finale
 
-Version 1 : audit d'observation, aucun test à activer. Version 6 : tests complets déjà activés.
+| Route | Anonyme | Alice USER | Bob ADMIN |
+| --- | ---: | ---: | ---: |
+| GET /api/public/info | 200 | 200 | 200 |
+| GET /api/tasks | 401 | 200 | 200 |
+| POST /api/tasks | 401 | 201 | 201 |
+| GET /api/admin/stats | 401 | 403 | 200 |
+| GET /api/tasks/confidential | 401 | 403 | 200 |
 
-## Passer à une autre branche
+401 indique que l’authentification est absente ou invalide. 403 indique que l’identité est reconnue mais que son rôle ne permet pas l’accès.
 
-```bash
-# arrêter d'abord Spring Boot et Vite avec Ctrl+C
-git fetch origin
-git switch Tp_version2
-mvn clean test
-mvn spring-boot:run
-# autre terminal :
-cd frontend && npm run dev
-```
+## Vérification depuis l’interface
 
-Le **lien GitHub** d'une étape n'est pas un changement de branche local. **Redémarrez Java après chaque git switch** pour éviter de comparer un React v3 avec un backend v2.
-
-## Limites volontaires du TP
-
-Les comptes sont fictifs, codés en dur et stockés en mémoire. HTTP Basic est utilisé exclusivement en local pour illustrer l'authentification et les rôles. Pas de JWT, de base de données ni de formulaire de connexion sécurisé de production. Toutes les routes métier testées sont des GET.
-
-## Attention : sauvegarde Git des exercices
-
-Pour passer d'une branche à l'autre, sauvegardez les modifications de votre exercice par un commit local, ou avec `git stash push -u -m "TP"`. Sinon Git peut bloquer le changement de branche lorsqu'un fichier corrigé entre en conflit avec la version suivante.
-
-Un commit local ne publie pas automatiquement votre travail sur GitHub et ne modifie aucune autre branche.
+Ouvrez Mes tâches pour créer, modifier, terminer ou supprimer une tâche. Connectez-vous ensuite comme Alice ou Bob et ouvrez Statistiques ou Projet confidentiel. Planora affiche les réponses et les messages reçus de Spring ; le serveur reste la seule autorité qui accorde ou refuse l’accès.

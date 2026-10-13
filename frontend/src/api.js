@@ -1,72 +1,41 @@
-// Le navigateur parle à Vite (5173). Le proxy Vite transmet /api à Spring Boot (8080).
-// Pas de cookie, pas de localStorage, pas de persistance de mot de passe.
-export const ENDPOINTS = Object.freeze([
-  { id: "public", method: "GET", path: "/api/public/info", label: "Informations publiques", access: "Public", about: "Présenter les informations de l'application." },
-  { id: "tasks", method: "GET", path: "/api/tasks", label: "Liste des tâches", access: "Authentifié", about: "Consulter les tâches de l'équipe." },
-  { id: "admin", method: "GET", path: "/api/admin/stats", label: "Statistiques", access: "Administrateur", about: "Accéder aux chiffres réservés à l'administration." },
-  { id: "confidential", method: "GET", path: "/api/tasks/confidential", label: "Projet confidentiel", access: "Administrateur", about: "Tester la sécurité sur une méthode Java." }
-]);
-
-export function endpointsFor(version) {
-  return ENDPOINTS.filter((item) => item.id !== "confidential" || version >= 5);
-}
-
 export function basicAuthorization(username, password) {
   if (!username || !password) return null;
   const bytes = new TextEncoder().encode(username + ":" + password);
-  let value = "";
-  for (const byte of bytes) value += String.fromCharCode(byte);
-  return "Basic " + btoa(value);
+  let binary = "";
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return "Basic " + btoa(binary);
 }
 
-export function describeStatus(status) {
-  if (status === 200) return { label: "Autorisé", tone: "success" };
-  if (status === 401) return { label: "Non authentifié", tone: "warning" };
-  if (status === 403) return { label: "Accès refusé", tone: "danger" };
-  if (status === 404) return { label: "Endpoint absent", tone: "neutral" };
-  if (status === 0) return { label: "API inaccessible", tone: "danger" };
-  if (status >= 500) return { label: "Erreur serveur", tone: "danger" };
-  return { label: "HTTP " + status, tone: "neutral" };
-}
-
-export async function requestEndpoint(endpoint, identity) {
-  const started = performance.now();
-  const auth = basicAuthorization(identity?.username, identity?.password);
+export async function apiRequest(path, { method = "GET", body, credentials } = {}) {
   const headers = { Accept: "application/json" };
-  if (auth) headers.Authorization = auth;
-
+  const authorization = credentials && basicAuthorization(credentials.username, credentials.password);
+  if (authorization) headers.Authorization = authorization;
+  if (body !== undefined) headers["Content-Type"] = "application/json";
   try {
-    const response = await fetch(endpoint.path, {
-      method: endpoint.method,
+    const response = await fetch(path, {
+      method,
       headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
       cache: "no-store",
       credentials: "omit"
     });
-    const raw = await response.text();
-    let body = raw;
-    if (raw && (response.headers.get("content-type") || "").includes("json")) {
-      try { body = JSON.parse(raw); } catch { /* garder le texte brut */ }
+    const text = await response.text();
+    let data = text;
+    if (text && (response.headers.get("content-type") || "").includes("json")) {
+      try { data = JSON.parse(text); } catch { /* Réponse texte reçue. */ }
     }
-    return {
-      status: response.status,
-      body,
-      duration: Math.round(performance.now() - started),
-      at: new Date().toLocaleTimeString("fr-FR")
-    };
-  } catch (error) {
-    return {
-      status: 0,
-      body: "Impossible de joindre l'API. Vérifiez que Spring Boot fonctionne sur le port 8080, puis réessayez.",
-      error: String(error),
-      duration: Math.round(performance.now() - started),
-      at: new Date().toLocaleTimeString("fr-FR")
-    };
+    return { ok: response.ok, status: response.status, data };
+  } catch {
+    return { ok: false, status: 0, data: "Impossible de joindre l’API. Vérifiez que Spring Boot fonctionne sur le port 8080." };
   }
 }
 
-export function identityFor(key, custom) {
-  if (key === "alice") return { username: "alice", password: "alice123" };
-  if (key === "bob") return { username: "bob", password: "bob123" };
-  if (key === "custom") return { username: custom?.username || "", password: custom?.password || "" };
-  return null;
+export function getErrorMessage(result) {
+  if (result.status === 0) return result.data;
+  if (result.status === 401) return "HTTP 401 — authentification requise ou identifiants incorrects.";
+  if (result.status === 403) return "HTTP 403 — votre compte ne possède pas le rôle nécessaire.";
+  if (result.status === 404) return "HTTP 404 — cette ressource n’existe pas sur cette version du backend.";
+  if (result.status === 400) return "HTTP 400 — vérifiez les informations saisies.";
+  const detail = typeof result.data === "string" ? result.data : result.data?.message;
+  return "HTTP " + result.status + (detail ? " — " + detail : " — la requête a échoué.");
 }

@@ -1,10 +1,44 @@
 @baseUrl = http://localhost:8080
+@taskId = 1
 
-### 1. Endpoint public
+### Informations publiques
 GET {{baseUrl}}/api/public/info
 
-### 2. Tâches (encore publiques au départ)
+### Lister les tâches
 GET {{baseUrl}}/api/tasks
 
-### 3. Statistiques ADMIN (faille à découvrir)
+### Créer une tâche
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Préparer la démonstration",
+  "description": "Réunir les captures et vérifier le parcours.",
+  "status": "TODO",
+  "priority": "HIGH",
+  "dueDate": "2026-10-28"
+}
+
+### Modifier une tâche
+PUT {{baseUrl}}/api/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "title": "Préparer la démonstration",
+  "description": "Captures prêtes pour la revue.",
+  "status": "IN_PROGRESS",
+  "priority": "MEDIUM",
+  "dueDate": "2026-10-28"
+}
+
+### Marquer comme terminée
+PATCH {{baseUrl}}/api/tasks/{{taskId}}/complete
+
+### Supprimer une tâche
+DELETE {{baseUrl}}/api/tasks/{{taskId}}
+
+### Statistiques (ADMIN à partir de l'exercice 4)
 GET {{baseUrl}}/api/admin/stats
+
+### Note confidentielle (ajoutée à l'exercice 5)
+GET {{baseUrl}}/api/tasks/confidential
