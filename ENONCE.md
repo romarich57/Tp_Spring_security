@@ -25,12 +25,6 @@ La fiche d’enquête à remplir se trouve dans le PDF `Tp.pdf`, à la section *
 
 Examinez `TaskController`, `AdminController`, `TaskService` et `StatisticsService`. Repérez les routes et cherchez où le serveur vérifie l’identité et les permissions.
 
-Votre conclusion doit :
-
-- proposer une politique d’accès pour une personne anonyme, un membre de l’équipe et un administrateur ;
-- expliquer au moins deux écarts entre cette politique et les résultats observés ;
-- décrire le risque concret de ces écarts ;
-- distinguer authentification et autorisation ;
-- expliquer pourquoi le contrôle doit être appliqué dans le backend.
+Répondez aux trois questions de la fiche : proposez les droits selon le profil, comparez-les aux résultats avec deux exemples et leurs risques, puis distinguez authentification et autorisation en expliquant pourquoi le contrôle doit être vérifié dans le backend.
 
 Conservez la fiche : elle vous servira à constater les changements après l’ajout de Spring Security. L’interface React reste le client métier fourni pendant tout le TP.
