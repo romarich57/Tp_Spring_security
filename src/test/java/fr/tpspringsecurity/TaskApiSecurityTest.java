@@ -1,5 +1,6 @@
 package fr.tpspringsecurity;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,32 +14,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class TaskApiSecurityTest {
+
     @Autowired
     private MockMvc mvc;
 
+    // Ces tests restent valides AVANT ET APRES l'exercice 4.
     @Test
-    void sansAuthentificationTousLesEndpointsRestentProteges() throws Exception {
-        mvc.perform(get("/api/public/info")).andExpect(status().isUnauthorized());
+    void lesTachesExigentToujoursUneAuthentification() throws Exception {
         mvc.perform(get("/api/tasks")).andExpect(status().isUnauthorized());
-        mvc.perform(get("/api/admin/stats")).andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void utilisateursDeclaresSontAuthentifies() throws Exception {
         mvc.perform(get("/api/tasks").with(httpBasic("alice", "alice123")))
                 .andExpect(status().isOk());
         mvc.perform(get("/api/tasks").with(httpBasic("bob", "bob123")))
                 .andExpect(status().isOk());
-        mvc.perform(get("/api/tasks").with(httpBasic("alice", "mauvais")))
+        mvc.perform(get("/api/tasks").with(httpBasic("alice", "erreur")))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void politiqueAdminNonEncoreActive() throws Exception {
-        mvc.perform(get("/api/admin/stats").with(httpBasic("alice", "alice123")))
+    void bobPeutDejaLireLesStatistiques() throws Exception {
+        mvc.perform(get("/api/admin/stats").with(httpBasic("bob", "bob123")))
                 .andExpect(status().isOk());
+        mvc.perform(get("/api/admin/stats")).andExpect(status().isUnauthorized());
+    }
+
+    // Activer ce test seulement APRES avoir termine les TODO de SecurityConfig.
+    @Disabled("TODO exercice 4 : ajoutez SecurityFilterChain puis retirez @Disabled.")
+    @Test
+    void exercice4LAccesPublicEtLesDroitsAdminSontRespectes() throws Exception {
+        mvc.perform(get("/api/public/info")).andExpect(status().isOk());
+        mvc.perform(get("/api/admin/stats").with(httpBasic("alice", "alice123")))
+                .andExpect(status().isForbidden());
         mvc.perform(get("/api/admin/stats").with(httpBasic("bob", "bob123")))
                 .andExpect(status().isOk());
     }
-
 }

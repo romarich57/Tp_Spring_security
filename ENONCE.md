@@ -13,6 +13,6 @@ Les deux utilisateurs Alice (USER) et Bob (ADMIN) fonctionnent déjà. Mais Alic
 
 **Conseil :** l'ordre des `requestMatchers` compte ; placez les règles spécifiques avant `anyRequest()`.
 
-Les tests de cette branche démontrent volontairement le problème (Alice accède encore aux stats). Les résultats de sécurité souhaités figurent dans [le plan](docs/PLAN_DU_TP.md).
+Les tests existants restent valides avant et après vos modifications. Lorsque vous avez terminé les TODO, retirez `@Disabled` du test `exercice4LAccesPublicEtLesDroitsAdminSontRespectes` dans `TaskApiSecurityTest.java`, puis exécutez `mvn test`. Vous pouvez également tester visuellement dans React.
 
 Correction dans la branche `Tp_version5`.
