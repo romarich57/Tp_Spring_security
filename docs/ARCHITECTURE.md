@@ -1,43 +1,64 @@
-# Architecture : une responsabilite par composant
+# Architecture de l’application
 
-L'objectif du TP est **Spring Security**, pas l'implementation d'une base de donnees. Les controleurs et les services metier sont donc fournis aux etudiants.
+Le produit pédagogique est un gestionnaire de tâches React relié à une API Spring Boot. L’interface est fournie et reste la même dans toutes les branches. Les étudiants font évoluer le backend et appliquent les règles d’accès dans Spring Security.
 
-```text
-src/main/java/fr/tpspringsecurity/
-  TpSpringSecurityApplication.java   # Démarrage Spring Boot
-  controller/
-    PublicController.java            # GET /api/public/info
-    TaskController.java              # GET /api/tasks (+ confidential dans l'exercice 5)
-    AdminController.java             # GET /api/admin/stats
-  service/
-    TaskService.java                 # Taches fictives et logique metier
-    StatisticsService.java           # Statistiques fictives
-  config/
-    UserConfig.java                  # Comptes en memoire + BCrypt (a partir de la version 3)
-    SecurityConfig.java              # Regles HTTP et methode (a partir de la version 3/4)
-```
+## Composants
 
-## Frontieres entre les responsabilites
+    frontend/src/main.jsx              Application métier React
+    frontend/src/api.js                 Appels JSON et HTTP Basic en mémoire
+    src/main/java/fr/tpspringsecurity/
+      controller/
+        PublicController.java           Informations publiques
+        TaskController.java             CRUD des tâches
+        AdminController.java            Statistiques
+      model/
+        Task.java, TaskRequest.java     Contrat JSON des tâches
+        TaskStats.java                 Indicateurs de l’espace
+      service/
+        TaskService.java                Données métier en mémoire
+        StatisticsService.java          Statistiques calculées
+      config/
+        UserConfig.java                 Comptes de démonstration (exercice 3)
+        SecurityConfig.java             Autorisations HTTP et méthodes
 
-| Composant | Ce qu'il doit faire | Ce qu'il ne doit PAS faire |
+Le stockage en mémoire évite d’introduire une base de données dans ce TP. Les données repartent de leur exemple initial au redémarrage du serveur.
+
+## Contrat métier constant
+
+| Méthode | Route | Fonction |
 | --- | --- | --- |
-| Controleurs | Exposer les URL, recevoir et retourner les donnees HTTP | Gerer les mots de passe ou stocker des donnees metier |
-| Services | Fournir les fonctionnalites metier, independamment du protocole HTTP | Configurer l'authentification ou choisir les codes HTTP |
-| UserConfig | Definir le `PasswordEncoder` et charger les comptes de demo | Proteger des chemins URL |
-| SecurityConfig | Declarer les politiques d'acces (HTTP et annotations) | Stocker les taches ou creer les utilisateurs |
-| Tests | Verifier les comportements annonces | Exposer des fonctionnalites applicatives |
+| GET | /api/tasks | Lister les tâches |
+| POST | /api/tasks | Créer une tâche |
+| PUT | /api/tasks/{id} | Modifier une tâche |
+| PATCH | /api/tasks/{id}/complete | La terminer |
+| DELETE | /api/tasks/{id} | La supprimer |
+| GET | /api/admin/stats | Lire les indicateurs calculés |
+| GET | /api/tasks/confidential | Lire une note interne, ajoutée à l’exercice 5 |
+| GET | /api/public/info | Lire les informations publiques |
 
-**Ne confondez pas** `AdminController` (simple point d'entree HTTP) avec une autorisation. C'est `SecurityConfig` qui protege `/api/admin/**`, a partir de l'exercice 4.
+Une tâche porte un titre, une description, un état, une priorité, une échéance et une personne assignée.
 
-## Emplacement des travaux a completer
+## Responsabilités
 
-| Version de depart | Fichier a modifier | Consigne |
+| Composant | Responsabilité |
+| --- | --- |
+| React | Afficher et manipuler les tâches, transmettre les identifiants saisis et présenter les réponses HTTP |
+| Controllers | Définir les routes et traduire HTTP vers les opérations métier |
+| Services | Appliquer la logique métier et gérer les données d’exemple |
+| UserConfig | Encoder les mots de passe et déclarer les rôles |
+| SecurityConfig | Définir les accès aux routes et activer la sécurité des méthodes |
+
+Les règles d’autorisation sont toujours imposées par le backend. Masquer un bouton React ne sécuriserait pas une API.
+
+## Progression pédagogique
+
+| Branche | Exercice | Travail demandé |
 | --- | --- | --- |
-| 1 | `docs/reponses/EXERCICE_1_A_COMPLETER.md` | Observer, pas coder |
-| 2 | `pom.xml` | Ajouter Spring Security |
-| 3 | `config/UserConfig.java` | BCrypt et les deux comptes |
-| 4 | `config/SecurityConfig.java` | Regles de `SecurityFilterChain` |
-| 5 | `controller/TaskController.java` et `config/SecurityConfig.java` | `@PreAuthorize`, activation de la securite des methodes |
-| 6 | Aucun | Corriges et tests finaux |
+| Tp_version1 | Audit | Observer qu’un visiteur peut gérer les tâches et consulter les statistiques |
+| Tp_version2 | Spring Security | Ajouter la dépendance et observer les réponses 401 |
+| Tp_version3 | Identités | Créer Alice USER, Bob ADMIN et l’encodeur BCrypt |
+| Tp_version4 | Autorisations HTTP | Rendre l’info publique, réserver les tâches aux comptes et les stats à ADMIN |
+| Tp_version5 | Sécurité de méthode | Protéger la note confidentielle avec @PreAuthorize |
+| Tp_version6 | Validation | Vérifier le parcours complet avec des tests d’intégration |
 
-**La regle pedagogique :** une seule fonctionnalite a implementer a la fois ; les etapes anterieures sont fonctionnelles et chaque point de depart compile.
+Chaque étape conserve les fonctionnalités métier déjà acquises et ajoute une notion de sécurité.
