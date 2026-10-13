@@ -267,25 +267,85 @@ Le test vérifie que les trois lectures (`/api/public/info`, `/api/tasks`, `/api
 
 ## 6. Exercice 3 — Déclarer les comptes avec BCrypt (15 min)
 
-**Branche :** `Tp_version3`. **Fichier :** `config/UserConfig.java`.
+**Branche :** `Tp_version3`. **Fichier à modifier :** `src/main/java/fr/tpspringsecurity/config/UserConfig.java`.
 
-| Identifiant exact | Mot de passe local | Rôle |
+### Objectif
+
+Remplacer le compte temporaire généré par Spring par deux comptes de TP définis dans l’application, puis stocker leurs mots de passe sous forme BCrypt. Vous configurez **qui peut s’authentifier** et les rôles de ces comptes. Vous ne configurez pas encore **quelles routes chaque rôle peut consulter** : c’est l’exercice 4.
+
+| Identifiant exact | Mot de passe de démonstration | Rôle à déclarer |
 | --- | --- | --- |
 | `alice` | `alice123` | `USER` |
 | `bob` | `bob123` | `ADMIN` |
 
-Complétez les TODO 3.1 à 3.4 :
+### Avant de coder
 
-1. Déclarez un Bean `PasswordEncoder` retournant `BCryptPasswordEncoder`.
-2. Déclarez un Bean `UserDetailsService` recevant cet encodeur.
-3. Construisez Alice et Bob avec `User.withUsername(...)` et `.roles(...)`.
-4. Encodez les mots de passe avec `encoder.encode(...)` et retournez un `InMemoryUserDetailsManager` contenant les deux comptes.
+Dans cette branche, Spring Security est déjà installé et sa politique HTTP par défaut est active. Au début, les routes demandent un compte `user` généré. `UserConfig.java` est volontairement incomplet ; ses commentaires indiquent les TODO 3.1 à 3.4. Travaillez uniquement dans ce fichier. Ne créez pas de `SecurityFilterChain` et ne modifiez pas `SecurityConfig.java`.
 
-Ne modifiez pas les règles HTTP dans cet exercice. Redémarrez Spring, connectez-vous successivement avec les deux comptes et consultez les tâches et les statistiques. Essayez aussi un mauvais mot de passe.
+### TODO 3.1 — Déclarer l’encodeur BCrypt
 
-**Résultat attendu :** Alice et Bob lisent les tâches **et les statistiques** ; un mauvais mot de passe produit `401`. Les rôles sont déclarés mais aucune règle ne réserve encore les statistiques à `ADMIN`. Les mutations restent refusées avec `403` sans jeton CSRF.
+Créez un Bean de type `PasswordEncoder`. Il doit retourner une instance de `BCryptPasswordEncoder`. Cet objet servira à encoder les mots de passe au moment de créer les comptes, puis Spring s’en servira pour vérifier ceux saisis à la connexion.
 
-Expliquez la différence entre déclarer un rôle et imposer une autorisation, ainsi que l’intérêt de BCrypt. Retirez `@Disabled` du test `exercice3AliceEtBobPeuventSeConnecter`, puis lancez `mvn test`.
+Imports à repérer : `Bean`, `PasswordEncoder` et `BCryptPasswordEncoder`.
+
+### TODO 3.2 — Déclarer la source des utilisateurs
+
+Créez un Bean `UserDetailsService` qui reçoit le `PasswordEncoder` en paramètre :
+
+```java
+@Bean
+public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+    // Créer les deux comptes puis les stocker en mémoire.
+}
+```
+
+Spring injectera le Bean créé au TODO 3.1. La méthode doit fournir au système de sécurité les comptes qu’il utilisera pour authentifier les requêtes.
+
+### TODO 3.3 — Construire les deux comptes
+
+Dans cette méthode, construisez un `UserDetails` pour Alice et un pour Bob avec `User.withUsername(...)`. Pour chacun, renseignez l’identifiant du tableau, un mot de passe encodé et le rôle correspondant (`USER` ou `ADMIN`). Terminez chaque construction avec `.build()`.
+
+**Attention :** passez le mot de passe à `encoder.encode(...)` avant de l’attribuer. Ne stockez pas le texte `alice123` ou `bob123` directement dans l’objet utilisateur. Utilisez `.roles("ADMIN")` pour déclarer le rôle de Bob ; Spring le convertit en autorité `ROLE_ADMIN`.
+
+Imports à repérer : `User`, `UserDetails` et `UserDetailsService`.
+
+### TODO 3.4 — Retourner le gestionnaire en mémoire
+
+Retournez un `InMemoryUserDetailsManager` contenant les deux objets construits. Il remplace la source d’utilisateurs automatique pour l’application : après redémarrage, le compte `user` généré n’est plus celui que vous utilisez.
+
+Import à repérer : `InMemoryUserDetailsManager`.
+
+### Vérifier dans Planora et avec l’API
+
+Redémarrez Spring. Essayez d’abord l’ancien compte `user`, puis connectez-vous avec Alice et Bob. Pour chacun, consultez **Mes tâches** et **Statistiques**. Essayez enfin Alice avec un mauvais mot de passe. Vous pouvez contrôler une lecture avec curl :
+
+```bash
+curl -i -u alice:alice123 http://localhost:8080/api/tasks
+curl -i -u bob:bob123 http://localhost:8080/api/admin/stats
+curl -i -u alice:incorrect http://localhost:8080/api/tasks
+```
+
+**Résultats à observer :** Alice et Bob obtiennent `200` sur les tâches et les statistiques ; le mauvais mot de passe reçoit `401`. Les statistiques répondent encore `200` pour Alice : son rôle est bien enregistré, mais aucune règle HTTP ne l’utilise encore. Le chemin `/admin/` ne réserve pas une route à un administrateur à lui seul.
+
+Les mutations peuvent répondre `403` même quand Alice ou Bob est authentifié. C’est la protection CSRF par défaut de cette étape, pas une conséquence de leur rôle. Ne changez pas CSRF ici ; l’exercice 4 configurerа les règles HTTP et le comportement des mutations.
+
+### TODO 3.5 — Activer le test fourni
+
+Dans `src/test/java/fr/tpspringsecurity/TaskApiSecurityTest.java`, repérez `exercice3AliceEtBobPeuventSeConnecter`. Retirez `@Disabled` située juste au-dessus de cette méthode et exécutez :
+
+```bash
+mvn test
+```
+
+Ce test vérifie qu’Alice et Bob lisent la liste des tâches (`200`) et qu’un mauvais mot de passe pour Alice est refusé (`401`). Il ne vérifie pas encore que les statistiques sont réservées à Bob : ajoutez cette observation depuis Planora ou curl.
+
+### Questions de compréhension
+
+1. Quel rôle joue `PasswordEncoder` à la création du compte puis lors d’une connexion ?
+2. Le rôle `ADMIN` protège-t-il déjà `/api/admin/stats` ? Justifiez avec votre observation.
+3. Quelle différence faites-vous entre authentifier un compte et autoriser ce compte à utiliser une route ?
+
+**Pour continuer :** la branche `Tp_version4` contient la correction de `UserConfig.java`. Vous y configurerez les autorisations HTTP.
 
 ## 7. Exercice 4 — Configurer les accès HTTP (10 min)
 
