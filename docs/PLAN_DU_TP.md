@@ -44,3 +44,13 @@ Ces identifiants sont **uniquement des données d'exercice**, jamais des identif
 - Les trois premières routes sont des GET : le TP n'impose pas de désactiver CSRF.
 - Un rôle `ADMIN` déclaré avec `.roles("ADMIN")` devient l'autorité `ROLE_ADMIN`.
 - L'API utilise HTTP Basic pour isoler la pédagogie Spring Security ; la connexion JWT est hors périmètre.
+
+## Interface React et validation
+
+Chaque branche contient l'interface `frontend/` adaptée à son exercice. Lancer Java avec `mvn spring-boot:run` et React avec `cd frontend && npm install && npm run dev` dans **deux terminaux**, puis ouvrir **http://localhost:5173**.
+
+Changer de branche nécessite de **redémarrer Spring Boot**. Le lien GitHub dans la navigation de React ne change pas la branche locale.
+
+Les scénarios détaillés *avant/après* se trouvent dans [SCENARIOS_DE_TEST.md](SCENARIOS_DE_TEST.md).
+
+Dans les branches 2 à 5, certains tests d'acceptation portent `@Disabled`. L'étudiant doit d'abord implémenter ses TODO, puis retirer l'annotation sur le test de l'exercice courant. Les tests déjà actifs ne doivent pas échouer lorsque les TODO sont complétés. La branche 6 exécute tous les scénarios corrigés.

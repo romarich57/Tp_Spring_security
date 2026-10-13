@@ -1,22 +1,26 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { EXERCISES, IDENTITIES } from "../src/exercises.js";
 import { basicAuthorization, describeStatus, endpointsFor, identityFor } from "../src/api.js";
+
+test("parcours pedagogique de 60 minutes et six exercices", () => {
+  assert.equal(EXERCISES.length, 6);
+  assert.equal(EXERCISES.map(x => Number.parseInt(x.duration, 10)).reduce((a,b)=>a+b,0), 60);
+  assert.equal(IDENTITIES.length, 4);
+});
 
 test("les visiteurs anonymes n'envoient pas d'authentification", () => {
   assert.equal(basicAuthorization("", ""), null);
   assert.equal(identityFor("anonymous"), null);
 });
 
-test("HTTP Basic utilise les identifiants fournis", () => {
+test("HTTP Basic utilise les comptes pedagogiques", () => {
   assert.equal(basicAuthorization("alice", "alice123"), "Basic YWxpY2U6YWxpY2UxMjM=");
   assert.equal(basicAuthorization("bob", "bob123"), "Basic Ym9iOmJvYjEyMw==");
 });
 
-test("un compte personnalise n'est pas enregistre dans le navigateur", () => {
-  assert.deepEqual(identityFor("custom", { username: "user", password: "secret" }), {
-    username: "user",
-    password: "secret"
-  });
+test("un profil personnalise est transforme uniquement en identifiants de requete", () => {
+  assert.deepEqual(identityFor("custom", { username: "user", password: "secret" }), { username: "user", password: "secret" });
 });
 
 test("les endpoints evoluent a l'exercice 5", () => {
@@ -26,9 +30,8 @@ test("les endpoints evoluent a l'exercice 5", () => {
   assert.equal(endpointsFor(6).length, 4);
 });
 
-test("les codes 200 401 403 et 404 sont differencies", () => {
-  assert.equal(describeStatus(200).tone, "success");
-  assert.equal(describeStatus(401).tone, "warning");
-  assert.equal(describeStatus(403).tone, "danger");
-  assert.equal(describeStatus(404).label, "Endpoint absent");
+test("les statuts de securite sont differencies", () => {
+  for (const [status, tone] of [[200, "success"],[401, "warning"],[403, "danger"],[404, "neutral"],[0, "danger"]]) {
+    assert.equal(describeStatus(status).tone, tone);
+  }
 });

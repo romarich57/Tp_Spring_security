@@ -53,3 +53,24 @@ npm run build
 ```
 
 La CI GitHub Actions exécute ces vérifications et `mvn verify` sur chaque branche.
+
+## Passer à l'exercice suivant
+
+Un clic dans la navigation React ouvre le code GitHub, mais **ne change pas votre branche Git locale**.
+
+1. Arrêtez le backend et le serveur Vite (`Ctrl+C`).
+2. Depuis la racine, exécutez `git fetch origin` puis `git switch Tp_versionN` (remplacez N par la prochaine version).
+3. Redémarrez `mvn spring-boot:run` puis `cd frontend && npm run dev`.
+4. Rejouez les appels pour vérifier les nouveaux codes HTTP.
+
+**Important :** changer de branche pendant que Java tourne ne recharge pas les classes déjà lancées. Vous risquez sinon d'observer l'interface de la nouvelle version contre le backend de l'ancienne version.
+
+## Comprendre les profils et réponses
+
+- Aux versions 1 à 3, Alice et Bob ne sont pas encore déclarés dans l'état initial du backend. Leurs boutons permettent de voir le comportement avant leur création.
+- À l'exercice 2, choisissez « Personnalisé » pour essayer `user` et le mot de passe affiché dans la console **après** l'ajout de Spring Security.
+- En version 5, la route `/api/tasks/confidential` est encore à créer : elle peut renvoyer **404** après authentification. Cela fait partie de l'exercice, ce n'est pas un bug React.
+- Les étiquettes « Cible » décrivent les droits **à obtenir**, non l'état actuel de sécurité.
+- Le témoin « Mode local » ne certifie pas que Spring Boot est démarré : les appels de test le déterminent réellement.
+
+Tableaux de référence : [docs/SCENARIOS_DE_TEST.md](../docs/SCENARIOS_DE_TEST.md).
