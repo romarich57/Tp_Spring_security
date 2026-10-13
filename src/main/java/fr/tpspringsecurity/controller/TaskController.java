@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Responsabilite : HTTP des taches, sans logique metier ni regles de securite. */
+/** Responsabilite : HTTP des taches et annotations d'autorisation, sans logique metier. */
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
