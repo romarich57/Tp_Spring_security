@@ -2,6 +2,8 @@
 
 **Spring Boot, Spring Security et client React Planora**
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Durée : **60 minutes**, après une présentation théorique de 30 minutes. Travail individuel ou en binôme. Technologies : Java 17, Maven, Spring Boot et React/Vite.
 
 **Nom et prénom :** .............................................................  
