@@ -57,7 +57,7 @@ Les règles d’autorisation sont toujours imposées par le backend. Masquer un 
 | Tp_version1 | Audit | Observer qu’un visiteur peut gérer les tâches et consulter les statistiques |
 | Tp_version2 | Spring Security | Ajouter la dépendance et observer les réponses 401 |
 | Tp_version3 | Identités | Créer Alice USER, Bob ADMIN et l’encodeur BCrypt |
-| Tp_version4 | Autorisations HTTP | Rendre l’info publique, réserver les tâches aux comptes et les stats à ADMIN |
+| Tp_version4 | Autorisations HTTP | Rendre l’info publique, réserver les tâches aux comptes et les stats à ADMIN, configurer CSRF pour l’API stateless |
 | Tp_version5 | Sécurité de méthode | Protéger la note confidentielle avec @PreAuthorize |
 | Tp_version6 | Validation | Vérifier le parcours complet avec des tests d’intégration |
 

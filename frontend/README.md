@@ -37,6 +37,8 @@ Le formulaire transmet le nom et le mot de passe en HTTP Basic à chaque requêt
 
 Les contrôles d’accès restent exclusivement dans Spring Security. L’interface affiche les réponses du serveur, dont 401 pour une authentification absente ou invalide et 403 quand le rôle ne suffit pas. En version 1, les identifiants ne sont pas encore vérifiés puisque l’API est ouverte.
 
+À partir de l’exercice 4, la chaîne de sécurité est sans état et désactive la protection CSRF fondée sur les cookies afin que les mutations JSON authentifiées fonctionnent avec ce client HTTP Basic.
+
 ## Parcours des branches
 
 La même interface est présente dans les six branches. Les règles de l’API évoluent :
