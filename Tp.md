@@ -347,50 +347,134 @@ Ce test vérifie qu’Alice et Bob lisent la liste des tâches (`200`) et qu’u
 
 **Pour continuer :** la branche `Tp_version4` contient la correction de `UserConfig.java`. Vous y configurerez les autorisations HTTP.
 
-## 7. Exercice 4 — Configurer les accès HTTP (10 min)
+## 7. Exercice 4 — Définir les autorisations HTTP (10 min)
 
-**Branche :** `Tp_version4`. **Fichier :** `config/SecurityConfig.java`.
+**Branche :** `Tp_version4`. **Fichier à modifier :** `src/main/java/fr/tpspringsecurity/config/SecurityConfig.java`.
 
-Les comptes sont déjà corrigés. Complétez les TODO 4.1 à 4.6 :
+### Objectif
 
-1. Déclarez un Bean `SecurityFilterChain` recevant `HttpSecurity`.
-2. Autorisez `GET /api/public/info` avec `permitAll()`.
-3. Réservez `GET /api/admin/**` à `hasRole("ADMIN")`.
-4. Exigez `authenticated()` pour toutes les autres requêtes.
-5. Activez HTTP Basic et `SessionCreationPolicy.STATELESS`.
-6. Désactivez CSRF avec `.csrf(csrf -> csrf.disable())`, puis construisez la chaîne.
+Les comptes Alice (`USER`) et Bob (`ADMIN`) existent et peuvent tous deux lire les tâches et les statistiques. Vous allez maintenant faire appliquer leurs permissions par Spring Security : laisser une route explicitement publique, limiter les statistiques aux administrateurs, puis exiger une authentification pour le reste de l’API.
 
-Déclarez les règles spécifiques avant `anyRequest()`. Les comptes restent dans `UserConfig`.
+Vous allez également configurer HTTP Basic sans session, et adapter CSRF afin que les mutations du client React fourni fonctionnent. Les comptes et leurs rôles restent dans `UserConfig.java`.
 
-**Choix pour ce TP local :** le client fourni envoie explicitement l’en-tête `Authorization`, utilise `credentials: "omit"` et n’utilise pas de cookie de session. On désactive CSRF pour permettre ses mutations JSON. **Une API sans état ou utilisant HTTP Basic n’est pas automatiquement à l’abri de CSRF** : le navigateur peut envoyer automatiquement des identifiants Basic dans d’autres configurations. Si l’authentification ou le client change, il faut réévaluer cette politique. Voir la [documentation Spring Security sur CSRF](https://docs.spring.io/spring-security/reference/features/exploits/csrf.html).
+### Avant de coder
 
-Vérifiez avec Planora :
+Dans `SecurityConfig.java`, les TODO 4.1 à 4.6 sont des étapes d’une seule chaîne de filtres. Les imports nécessaires ne sont pas tous présents : ajoutez-les depuis les types indiqués ci-dessous. Gardez les règles d’accès dans le même ordre que les étapes.
 
-- Anonyme : les tâches sont refusées avec `401`.
-- Alice : création `201`, modification et clôture `200`, suppression `204` ; statistiques `403`.
-- Bob : gestion des tâches et statistiques autorisées.
-- Avec `curl`, `GET /api/public/info` fonctionne sans identifiants.
+### TODO 4.1 — Déclarer la chaîne de sécurité
 
-La route confidentielle est encore absente : un compte valide reçoit `404`, tandis qu’un appel anonyme est bloqué par la sécurité avec `401`.
+Ajoutez l’annotation `@Bean` sur une méthode qui retourne `SecurityFilterChain` et reçoit `HttpSecurity`. La méthode doit configurer puis retourner la chaîne ; c’est là que Spring décide si une requête anonyme ou authentifiée peut atteindre les contrôleurs.
 
-Retirez `@Disabled` du test `exercice4LAccesPublicEtLesDroitsAdminSontRespectes`, puis lancez `mvn test`. Le test inclut une création de tâche authentifiée : oublier CSRF laisse cette opération en échec.
+Types à importer : `Bean`, `HttpSecurity`, `SecurityFilterChain`.
 
-## 8. Exercice 5 — Protéger une méthode (10 min)
+### TODO 4.2 à 4.4 — Définir et ordonner les règles d’accès
 
-**Branche :** `Tp_version5`. **Fichiers :** `controller/TaskController.java` et `config/SecurityConfig.java`.
+Dans `authorizeHttpRequests`, ajoutez les règles dans cet ordre :
 
-La route `GET /api/tasks/confidential` et son objet `ConfidentialProject` sont **déjà fournis**. Elle appelle `taskService.confidential()` et retourne le projet Orion, son client, un résumé et une note interne. Aucun endpoint métier n’est à créer.
+1. Pour `GET /api/public/info`, utilisez `requestMatchers(HttpMethod.GET, "/api/public/info").permitAll()`.
+2. Pour `GET /api/admin/**`, utilisez `requestMatchers(HttpMethod.GET, "/api/admin/**").hasRole("ADMIN")`.
+3. Pour toutes les requêtes restantes, utilisez `anyRequest().authenticated()`.
 
-1. Connectez-vous avec Alice et ouvrez Projet confidentiel : au début, elle peut lire la note (`200`). La règle HTTP générale exige seulement une authentification.
-2. Activez `@PreAuthorize("hasRole('ADMIN')")` sur la méthode `confidential()` de `TaskController` (TODO 5.1).
-3. Ajoutez `@EnableMethodSecurity` à `SecurityConfig` (TODO 5.2).
-4. Redémarrez et vérifiez : anonyme `401`, Alice `403`, Bob `200`.
+Importez `HttpMethod`. Les règles précises doivent être évaluées avant `anyRequest()`, qui termine la liste. `hasRole("ADMIN")` contrôle l’autorité `ROLE_ADMIN`, ajoutée aux comptes avec `.roles("ADMIN")` à l’exercice précédent.
 
-Ne créez pas de matcher HTTP spécifique pour cette route : l’exercice porte sur la sécurité des méthodes. `hasRole('ADMIN')` vérifie l’autorité `ROLE_ADMIN` créée par `.roles("ADMIN")`.
+### TODO 4.5 — Configurer HTTP Basic et les sessions
 
-Expliquez le rôle de `@EnableMethodSecurity`. Comparez cette protection avec les règles HTTP. Pourquoi les données restent-elles dans le service ?
+Configurez la politique de session avec `SessionCreationPolicy.STATELESS`, puis activez HTTP Basic avec `httpBasic(withDefaults())`. Chaque requête protégée doit alors présenter ses identifiants ; le serveur ne conserve pas une session de connexion entre les appels.
 
-Retirez `@Disabled` du test `exercice5MethodeConfidentielleReserveeAuxAdmins`, puis lancez `mvn test`. Vérifiez que le CRUD et les statistiques fonctionnent toujours selon les règles de l’exercice 4.
+Types à importer : `SessionCreationPolicy` et `withDefaults` de `org.springframework.security.config.Customizer`.
+
+### TODO 4.6 — Adapter CSRF au client fourni
+
+Ajoutez `.csrf(csrf -> csrf.disable())` dans la chaîne avant de la construire avec `.build()`.
+
+Ce choix permet au client de TP d’envoyer ses requêtes JSON POST, PUT, PATCH et DELETE avec l’en-tête `Authorization` qu’il construit explicitement, et sans cookie. **Ne généralisez pas cette désactivation à toutes les API stateless ou HTTP Basic** : le navigateur peut envoyer automatiquement des identifiants Basic dans d’autres configurations, ce qui peut exposer à CSRF. Si le mode d’authentification ou le client change, réévaluez la protection. Consultez la [documentation Spring Security sur CSRF](https://docs.spring.io/spring-security/reference/features/exploits/csrf.html).
+
+### Vérifier les permissions dans Planora
+
+Redémarrez Spring puis vérifiez les cas suivants. Relevez les statuts dans l’onglet Réseau ; les opérations métier doivent réellement réussir ou être refusées par le serveur.
+
+- **Sans connexion :** Mes tâches est refusé avec `401`. La route publique `/api/public/info` doit être vérifiée avec curl et renvoyer `200`.
+- **Alice :** elle peut consulter les tâches, créer (`201`), modifier et terminer (`200`), puis supprimer (`204`). L’ouverture des statistiques est refusée avec `403`.
+- **Bob :** il peut gérer les tâches et consulter les statistiques (`200`).
+- **Projet confidentiel :** dans cette branche, la route n’existe pas encore. Sans compte, Spring refuse d’abord la requête (`401`). Avec Alice ou Bob, la requête passe le filtre HTTP, puis le contrôleur absent entraîne `404`.
+
+```bash
+curl -i http://localhost:8080/api/public/info
+curl -i -u alice:alice123 http://localhost:8080/api/admin/stats
+curl -i -u bob:bob123 http://localhost:8080/api/admin/stats
+```
+
+### Activer le test fourni
+
+Dans `TaskApiSecurityTest.java`, retirez `@Disabled` au-dessus de `exercice4LAccesPublicEtLesDroitsAdminSontRespectes`, puis lancez `mvn test`. Le test vérifie la route publique, le refus des statistiques à Alice, leur accès par Bob et la création d’une tâche par Alice. Cette dernière requête permet aussi de vérifier que CSRF a bien été configuré pour le client.
+
+Les autres tests actifs vérifient déjà qu’un visiteur ne lit pas les tâches (`401`) et que les deux comptes valides y accèdent (`200`).
+
+### Questions de compréhension
+
+1. Pourquoi faut-il placer les règles publiques et ADMIN avant `anyRequest()` ?
+2. Pourquoi Alice reçoit-elle `403` sur les statistiques, alors qu’elle est authentifiée ?
+3. Que changent `STATELESS` et la désactivation de CSRF pour les requêtes de ce client ? Quelle précaution garder en tête si le client évolue ?
+
+**Pour continuer :** la branche `Tp_version5` contient la chaîne HTTP complète. Vous y protégerez une méthode Java avec `@PreAuthorize`.
+
+## 8. Exercice 5 — Protéger une méthode avec `@PreAuthorize` (10 min)
+
+**Branche :** `Tp_version5`. **Fichiers à modifier :** `src/main/java/fr/tpspringsecurity/controller/TaskController.java` et `src/main/java/fr/tpspringsecurity/config/SecurityConfig.java`.
+
+### Objectif
+
+La chaîne HTTP de l’exercice 4 protège déjà les statistiques, mais elle exige seulement une authentification pour les routes restantes sous `/api/tasks`. Vous allez ajouter une deuxième vérification, au niveau d’une méthode Java, pour que seul le rôle `ADMIN` puisse lire le projet confidentiel.
+
+Cet exercice montre la différence entre filtrer une requête HTTP selon son chemin et vérifier les permissions juste avant l’exécution d’une méthode. La ressource métier et sa route sont déjà présentes : il ne faut pas les recréer.
+
+### État initial à constater
+
+La branche 5 expose déjà `GET /api/tasks/confidential`. Le contrôleur appelle `taskService.confidential()` et retourne un objet `ConfidentialProject`. À l’ouverture de la branche, la règle HTTP générale demande une authentification, mais Alice peut encore lire la note (`200`). Bob y accède également (`200`) ; un visiteur reçoit `401`.
+
+Connectez-vous comme Alice dans Planora et ouvrez **Projet confidentiel** avant la correction. Relevez le statut. Cette requête est votre état de comparaison.
+
+### TODO 5.1 — Protéger la méthode du contrôleur
+
+Dans `TaskController.java`, repérez la méthode existante annotée `@GetMapping("/confidential")` et le commentaire juste au-dessus.
+
+- Importez `org.springframework.security.access.prepost.PreAuthorize` si nécessaire.
+- Activez l’annotation `@PreAuthorize("hasRole('ADMIN')")` sur la méthode `confidential()`.
+- Laissez son corps appeler le service comme il le fait déjà.
+
+Ne créez pas un nouvel endpoint et ne déplacez pas la logique métier dans le contrôleur.
+
+### TODO 5.2 — Activer la sécurité des méthodes
+
+Dans `SecurityConfig.java`, ajoutez `@EnableMethodSecurity` à la classe de configuration. Sans cette annotation, la vérification `@PreAuthorize` n’est pas activée.
+
+N’ajoutez pas de matcher HTTP pour `/api/tasks/confidential`. La règle générale existante exige déjà une identité ; dans cet exercice, la restriction supplémentaire au rôle ADMIN doit venir de la méthode.
+
+### Vérifier après redémarrage
+
+Réessayez la route dans Planora avec chaque identité et observez les réponses :
+
+| Profil | Résultat attendu |
+| --- | --- |
+| Sans compte | `401` — authentification exigée par la règle HTTP |
+| Alice (`USER`) | `403` — identifiée, mais le rôle ne suffit pas |
+| Bob (`ADMIN`) | `200` — méthode autorisée |
+
+`hasRole("ADMIN")` recherche l’autorité `ROLE_ADMIN`, que Spring associe au rôle déclaré avec `.roles("ADMIN")`.
+
+### TODO 5.3 — Activer le test fourni
+
+Dans `TaskApiSecurityTest.java`, retirez `@Disabled` juste au-dessus de `exercice5MethodeConfidentielleReserveeAuxAdmins`, puis lancez `mvn test`. Le test vérifie les trois cas de la matrice (anonyme, Alice, Bob).
+
+Vérifiez aussi que Mes tâches et Statistiques conservent les droits de l’exercice précédent : Alice peut gérer les tâches mais reçoit `403` sur les statistiques ; Bob peut accéder aux deux.
+
+### Questions de compréhension
+
+1. Quel est l’état de l’accès d’Alice avant et après l’ajout de `@PreAuthorize` ?
+2. Que fait `@EnableMethodSecurity` ?
+3. Quelle différence entre la règle générale `authenticated()` et la vérification de rôle sur cette méthode ? Pourquoi les données restent-elles dans le service ?
+
+**Pour continuer :** la branche `Tp_version6` contient les deux annotations actives et les tests complets.
 
 ## 9. Exercice 6 — Vérifier le parcours final (5 min)
 

@@ -1,20 +1,48 @@
-# Exercice 5 — Protéger une ressource confidentielle (10 min)
+# Exercice 5 — Protéger une méthode avec @PreAuthorize (10 min)
 
-Les règles HTTP protègent déjà les tâches et les statistiques. Planora expose maintenant une note de projet confidentielle par GET /api/tasks/confidential. Cette route est authentifiée par la règle générale, mais Alice peut encore la lire : il faut contrôler son rôle au niveau de la méthode Java.
+**Branche :** `Tp_version5`
+**Fichiers à modifier :** `src/main/java/fr/tpspringsecurity/controller/TaskController.java` et `src/main/java/fr/tpspringsecurity/config/SecurityConfig.java`.
 
-## Ajouter la règle de méthode
+## Objectif
 
-1. Dans TaskController, activez @PreAuthorize("hasRole('ADMIN')") sur la méthode confidential().
-2. Dans config/SecurityConfig.java, activez @EnableMethodSecurity sur la configuration.
-3. Ne déplacez pas la règle de cette ressource dans les matchers HTTP : l’objectif est d’exercer la sécurité des méthodes.
+La règle générale `authenticated()` protège déjà les routes de tâches. Dans cet exercice, ajoutez un contrôle plus précis sur la méthode qui fournit le projet confidentiel : Alice peut s’authentifier, mais seul Bob, qui possède le rôle ADMIN, doit lire la note. Le but est de combiner la sécurité HTTP et la sécurité au niveau des méthodes Java.
 
-## Vérifier l’application
+## État initial
 
-1. Ouvrez Projet confidentiel sans compte : Spring renvoie 401.
-2. Connectez-vous comme Alice : après la correction, Spring renvoie 403.
-3. Connectez-vous comme Bob : la note JSON du projet Orion s’affiche.
-4. Vérifiez que les tâches et les statistiques continuent de respecter leurs propres règles.
+La route `GET /api/tasks/confidential`, la méthode du contrôleur et l’objet `ConfidentialProject` sont déjà fournis. La méthode appelle `taskService.confidential()`. Ne créez aucune nouvelle route ni donnée.
 
-Retirez @Disabled du test exercice5MethodeConfidentielleReserveeAuxAdmins dans TaskApiSecurityTest.java et lancez mvn test.
+Avant de modifier le code, ouvrez Projet confidentiel comme Alice. Elle reçoit `200` à cette étape, car la règle HTTP générale demande seulement un compte authentifié. Bob reçoit aussi `200` ; un visiteur reçoit `401`.
 
-Dans votre réponse, distinguez l’authentification (qui est l’utilisateur ?) de l’autorisation (a-t-il le rôle attendu ?). La version 6 contient la correction et la suite complète des tests d’intégration.
+## TODO 5.1 — Ajouter la règle sur la méthode
+
+Dans `TaskController.java`, repérez `confidential()` annotée par `@GetMapping("/confidential")`. Importez `PreAuthorize` si besoin et activez sur cette méthode :
+
+```java
+@PreAuthorize("hasRole('ADMIN')")
+```
+
+Laissez le contenu de la méthode et l’appel au service inchangés. N’ajoutez pas de règle spécifique pour cette route dans `SecurityFilterChain`.
+
+## TODO 5.2 — Activer la sécurité des méthodes
+
+Dans `SecurityConfig.java`, ajoutez `@EnableMethodSecurity` à la classe. Cette annotation permet à Spring d’évaluer `@PreAuthorize` lors de l’appel de la méthode.
+
+## TODO 5.3 — Vérifier les trois profils
+
+Redémarrez Spring et ouvrez la ressource dans Planora avec chaque profil :
+
+| Profil | Réponse après la correction |
+| --- | --- |
+| Sans compte | `401` |
+| Alice (`USER`) | `403` |
+| Bob (`ADMIN`) | `200` |
+
+## TODO 5.4 — Activer le test
+
+Dans `src/test/java/fr/tpspringsecurity/TaskApiSecurityTest.java`, retirez `@Disabled` juste au-dessus de `exercice5MethodeConfidentielleReserveeAuxAdmins`, puis exécutez `mvn test`. Le test vérifie les accès anonyme, Alice et Bob.
+
+Vérifiez également que les règles précédentes restent en place : Alice peut manipuler les tâches, mais ne lit pas les statistiques ; Bob accède aux tâches et aux statistiques.
+
+Questions : pourquoi Alice pouvait-elle lire la note avant la correction ? Que fait `@EnableMethodSecurity` ? En quoi une règle de méthode complète-t-elle `SecurityFilterChain` ? Pourquoi la méthode délègue-t-elle au service ?
+
+**Étape suivante :** la branche `Tp_version6` contient le corrigé complet.
