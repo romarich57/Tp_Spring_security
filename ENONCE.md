@@ -18,8 +18,10 @@ Relancez mvn spring-boot:run et relevez dans la console le mot de passe temporai
 
 1. Rejouez les requêtes vers /api/public/info, /api/tasks, /api/admin/stats et les opérations POST, PUT, PATCH, DELETE.
 2. Sans authentification, Spring Security doit renvoyer 401 pour toutes ces routes, y compris l’information publique.
-3. Dans le formulaire Planora, essayez user et le mot de passe temporaire. Le CRUD fonctionne de nouveau pour ce compte.
+3. Dans le formulaire Planora, essayez user et le mot de passe temporaire. Les lectures fonctionnent pour ce compte.
 4. Expliquez pourquoi l’ajout de la dépendance n’a pas encore créé une règle ADMIN.
+
+Spring Security active aussi CSRF par défaut : avec HTTP Basic, les lectures GET passent, mais les mutations peuvent renvoyer 403. L’exercice 4 adaptera cette protection au client REST stateless afin que POST, PUT, PATCH et DELETE fonctionnent.
 
 Après avoir ajouté la dépendance, retirez @Disabled du test exercice2LesRoutesDemandentUneConnexion dans TaskApiSecurityTest.java, puis lancez mvn test.
 
