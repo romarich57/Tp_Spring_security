@@ -20,6 +20,7 @@ function App() {
   const [confidential, setConfidential] = useState(null);
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [identity, setIdentity] = useState(null);
+  const [apiState, setApiState] = useState("checking");
   const [loginOpen, setLoginOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -28,7 +29,11 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const request = useCallback((path, options = {}) => apiRequest(path, { ...options, credentials: identity ? credentials : null }), [credentials, identity]);
+  const request = useCallback(async (path, options = {}) => {
+    const result = await apiRequest(path, { ...options, credentials: identity ? credentials : null });
+    setApiState(result.status === 0 ? "offline" : "online");
+    return result;
+  }, [credentials, identity]);
   const loadTasks = useCallback(async () => {
     const result = await request("/api/tasks");
     if (!result.ok) throw new Error(getErrorMessage(result));
@@ -74,12 +79,15 @@ function App() {
   }
   async function submitLogin(event) {
     event.preventDefault();
-    setIdentity(credentials.username.trim());
+    const loginCredentials = { ...credentials, username: credentials.username.trim() };
+    setCredentials(loginCredentials);
+    setIdentity(loginCredentials.username);
     setLoginOpen(false);
     setMessage({ tone: "info", text: "Identifiants enregistrés en mémoire. Le serveur vérifiera les droits à la prochaine requête." });
     setLoading(true);
     try {
-      const result = await apiRequest("/api/tasks", { credentials });
+      const result = await apiRequest("/api/tasks", { credentials: loginCredentials });
+      setApiState(result.status === 0 ? "offline" : "online");
       if (!result.ok) throw new Error(getErrorMessage(result));
       setTasks(Array.isArray(result.data) ? result.data : []);
       setMessage({ tone: "success", text: "Requête acceptée par Spring pour « " + credentials.username.trim() + " »." });
@@ -144,7 +152,7 @@ function App() {
       <div className="sidebar-bottom"><div className="tip-card"><Sparkles size={17} /><b>Un pas à la fois</b><p>Terminez une tâche pour faire avancer le projet.</p></div><div className="profile-row"><span className="profile-avatar">{initials(identity || "Invité")}</span><span className="profile-text"><b>{identity || "Visiteur"}</b><small>{identity ? "Identifiants actifs" : "Non connecté"}</small></span><button className="icon-button profile-menu" aria-label={identity ? "Se déconnecter" : "Se connecter"} onClick={() => identity ? logout() : setLoginOpen(true)}>{identity ? <LogOut size={16} /> : <LogIn size={16} />}</button></div></div>
     </aside>
     <main className="main-content">
-      <header className="topbar"><button className="mobile-menu icon-button" aria-label="Ouvrir le menu" onClick={() => setMenuOpen(!menuOpen)}><Menu size={19} /></button><div className="breadcrumbs">Novalabs <span>/</span> <b>{eyebrow}</b></div><div className="topbar-actions"><span className="api-status"><i /> API Spring</span>{identity ? <button className="user-chip" onClick={logout}><span>{initials(identity)}</span>{identity}<LogOut size={14} /></button> : <button className="button button-secondary login-button" onClick={() => setLoginOpen(true)}><LogIn size={16} />Connexion</button>}</div></header>
+      <header className="topbar"><button className="mobile-menu icon-button" aria-label="Ouvrir le menu" onClick={() => setMenuOpen(!menuOpen)}><Menu size={19} /></button><div className="breadcrumbs">Novalabs <span>/</span> <b>{eyebrow}</b></div><div className="topbar-actions"><span className={"api-status " + (apiState === "offline" ? "api-offline" : "")}><i />{apiState === "offline" ? "API inaccessible" : apiState === "checking" ? "Connexion API" : "API Spring"}</span>{identity ? <button className="user-chip" onClick={logout}><span>{initials(identity)}</span>{identity}<LogOut size={14} /></button> : <button className="button button-secondary login-button" onClick={() => setLoginOpen(true)}><LogIn size={16} />Connexion</button>}</div></header>
       <div className="page-wrap">
         <section className="welcome"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{subtitle}</p></div>{page === "tasks" && <button className="button button-primary" onClick={() => { setEditing(null); setFormOpen(true); }}><Plus size={17} />Nouvelle tâche</button>}</section>
         {message && <div className={"toast toast-" + message.tone} role="status"><span>{message.tone === "error" ? <XCircle size={17} /> : message.tone === "success" ? <CheckCircle2 size={17} /> : <CircleHelp size={17} />}</span><p>{message.text}</p><button className="icon-button" aria-label="Fermer" onClick={() => setMessage(null)}><X size={16} /></button></div>}
@@ -163,7 +171,7 @@ function App() {
           </section>
         </>}
         {page === "stats" && <section className="data-panel"><div className="section-title-row"><div><h2>Statistiques de l’espace</h2><p>Chiffres calculés à partir des tâches courantes.</p></div><button className="button button-secondary" onClick={() => refresh("stats")} disabled={loading}><ArrowDownUp size={16} />Actualiser</button></div>{stats ? <StatsView stats={stats} /> : <AccessState loading={loading} message={message?.text} onRetry={() => refresh("stats")} />}</section>}
-        {page === "confidential" && <section className="confidential-panel"><div className="confidential-art"><div className="lock-orbit"><LockKeyhole size={32} /></div><span className="orbit orbit-one" /><span className="orbit orbit-two" /></div><div className="confidential-copy"><span className="secure-label"><ShieldCheck size={15} />RESSOURCE PROTÉGÉE</span><h2>Projet confidentiel</h2><p>Cette note de l’équipe est exposée par l’API et son accès est contrôlé côté Spring Security.</p>{confidential ? <div className="secret-note">{typeof confidential === "string" ? confidential : confidential.message || JSON.stringify(confidential)}</div> : <AccessState loading={loading} message={message?.text} onRetry={() => refresh("confidential")} />}</div></section>}
+        {page === "confidential" && <section className="confidential-panel"><div className="confidential-art"><div className="lock-orbit"><LockKeyhole size={32} /></div><span className="orbit orbit-one" /><span className="orbit orbit-two" /></div><div className="confidential-copy"><span className="secure-label"><ShieldCheck size={15} />RESSOURCE PROTÉGÉE</span><h2>Projet confidentiel</h2><p>Cette note de l’équipe est exposée par l’API et son accès est contrôlé côté Spring Security.</p>{confidential ? <div className="secret-note">{typeof confidential === "string" ? confidential : [confidential.projectName, confidential.client, confidential.summary, confidential.internalNote].filter(Boolean).join(" · ") || JSON.stringify(confidential)}</div> : <AccessState loading={loading} message={message?.text} onRetry={() => refresh("confidential")} />}</div></section>}
         <footer className="page-footer"><span><ShieldCheck size={15} />Application pédagogique · données conservées en mémoire</span><span>SPRING SECURITY · TP</span></footer>
       </div>
     </main>
