@@ -1,25 +1,21 @@
 # TP Spring Security — Version 2 / 6
 
-**Exercice 2 : installer et explorer la sécurité activée par défaut.**
-
-Cette branche contient les corrections des exercices 1 à 1, et le code **avant** la résolution de l'exercice 2.
-
-## Démarrage
-
-Pré-requis : **Java 17+**, **Maven 3.6.3+**, curl ou Postman.
+**Exercice 2 : ajouter Spring Security au projet.** L'exercice 1 est corrige dans `docs/corrections/EXERCICE_1.md`.
 
 ```bash
-git clone https://github.com/romarich57/Tp_Spring_security.git
-cd Tp_Spring_security
 git switch Tp_version2
 mvn clean test
 mvn spring-boot:run
 ```
 
-- [Consignes de l'étape](ENONCE.md)
-- [Plan complet](docs/PLAN_DU_TP.md)
-- [Guide de test HTTP](docs/GUIDE_HTTP.md)
-- Corrections précédentes : `docs/corrections/`.
-- Requêtes : `requests.http`.
+## Ou coder ?
 
-**Ne pas déployer en production.** Comptes et données entièrement fictifs.
+Ouvrez `pom.xml` : **TODO EXERCICE 2** vous indique ou ajouter la dependance Spring Security.
+
+- [Enonce](ENONCE.md)
+- [Architecture et responsabilites](docs/ARCHITECTURE.md)
+- [Corrige de l'exercice 1](docs/corrections/EXERCICE_1.md)
+- [Plan des versions](docs/PLAN_DU_TP.md)
+- [Guide HTTP](docs/GUIDE_HTTP.md)
+
+**Important :** `mvn test` doit fonctionner avant et apres l'ajout de la dependance. Les tests de l'authentification apparaitront a la version 3.

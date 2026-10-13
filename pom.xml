@@ -27,7 +27,7 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Exercice 2 : vous ajouterez ici Spring Security. -->
+        <!-- TODO EXERCICE 2 : ajouter ici spring-boot-starter-security (sans version explicite). -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

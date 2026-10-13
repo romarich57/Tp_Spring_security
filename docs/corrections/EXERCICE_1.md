@@ -1,15 +1,19 @@
-# Correction de l'exercice 1 — Audit de sécurité
+# Correction de l'exercice 1 — Audit de securite
 
-Avant Spring Security, les trois endpoints de la branche `Tp_version1` répondent **200 OK**, même sans authentification.
+**Avant toute installation de Spring Security**, les trois endpoints repondent tous **200 OK**, meme sans authentification.
 
-| Route | Observé | Politique souhaitée | Faiblesse |
+| Route | Observe | Politique souhaitee | Faille |
 | --- | --- | --- | --- |
-| `GET /api/public/info` | 200 | Public | Aucune |
-| `GET /api/tasks` | 200 | Authentifié | Divulgation des tâches |
-| `GET /api/admin/stats` | 200 | Rôle ADMIN | Divulgation de données réservées |
+| `GET /api/public/info` | 200 | Publique | Pas de faille |
+| `GET /api/tasks` | 200 | Utilisateur connecte | Taches visibles sans identite |
+| `GET /api/admin/stats` | 200 | ADMIN uniquement | Statistiques reservees exposees |
 
-Le nom `/admin` ne déclenche aucune protection automatique.
+Une classe appelee `AdminController` et une URL contenant `/admin` **ne constituent pas** une protection de securite.
 
-**Authentification** = vérifier *qui* appelle l'API. **Autorisation** = vérifier *ce qu'il peut faire*. Sans règles, l'API ne fait ni l'une ni l'autre.
+**Authentification** : qui es-tu ? **Autorisation** : as-tu le droit d'effectuer cette action ?
 
-Pour corriger les failles : ajouter l'authentification (exercice 2), puis distinguer les utilisateurs, rôles et permissions (exercices 3-5). Dans les étapes précédentes, la vulnérabilité est **volontaire et pédagogique**, à ne jamais reproduire en production.
+La separation des responsabilites existe deja : les **controllers** exposent HTTP, les **services** fournissent les donnees metier ; les **regles Spring Security** sont introduites plus tard dans `SecurityConfig`.
+
+Le probleme sera resolu progressivement : exercice 2 (authentification par defaut), exercice 3 (comptes et BCrypt), exercice 4 (controle des permissions), exercice 5 (regles au niveau des methodes).
+
+Ce projet est deliberement vulnerable a des fins de formation : ne le deployez pas en production.
