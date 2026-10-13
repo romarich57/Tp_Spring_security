@@ -1,5 +1,7 @@
 # Architecture de l’application
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Le produit pédagogique est un gestionnaire de tâches React relié à une API Spring Boot. L’interface est fournie et reste la même dans toutes les branches. Les étudiants font évoluer le backend et appliquent les règles d’accès dans Spring Security.
 
 ## Composants

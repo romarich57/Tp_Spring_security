@@ -1,5 +1,7 @@
 # Exercice 3 — Déclarer les comptes avec BCrypt (15 min)
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 **Branche :** `Tp_version3`
 
 **Fichier à modifier :** `src/main/java/fr/tpspringsecurity/config/UserConfig.java` uniquement.

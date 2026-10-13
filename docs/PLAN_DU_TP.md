@@ -1,5 +1,7 @@
 # Parcours pédagogique — 60 minutes
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 L’application Planora et son contrat de gestion des tâches sont déjà en place. Le TP fait évoluer le backend Spring par étapes ; les branches sont des points de départ successifs et autonomes.
 
 | Branche | Exercice | Évolution du backend |
