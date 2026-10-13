@@ -19,9 +19,11 @@ Dans src/main/java/fr/tpspringsecurity/config/UserConfig.java :
 ## Vérifier dans Planora
 
 1. Connectez-vous comme Alice puis comme Bob.
-2. Pour chacun, consultez et modifiez une tâche.
+2. Pour chacun, consultez la liste des tâches.
 3. Ouvrez Statistiques : les deux comptes peuvent encore y accéder.
 4. Essayez un mauvais mot de passe et observez le 401.
+
+Spring Security conserve sa protection CSRF par défaut à cette étape. Les mutations JSON peuvent donc répondre 403 avec un compte valide ; l’exercice 4 adaptera la configuration de cette API stateless pour les autoriser.
 
 L’identité est maintenant vérifiée, mais les rôles n’imposent pas encore de différence d’accès. Une route dont le chemin contient admin n’est pas protégée par son nom. Retirez @Disabled du test exercice3AliceEtBobPeuventSeConnecter dans TaskApiSecurityTest.java après avoir terminé UserConfig.
 
