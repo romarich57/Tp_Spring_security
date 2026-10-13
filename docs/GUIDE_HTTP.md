@@ -20,7 +20,7 @@ La seconde route apparaît dans l’exercice 5.
 
 ## Avec HTTP Basic
 
-À la version 2, utilisez user avec le mot de passe affiché dans la console Spring. À partir de la version 3 :
+Après l’ajout de la dépendance en exercice 2, utilisez user avec le mot de passe affiché dans la console Spring. Après l’exercice 3 (et dès le début des branches 4 à 6) :
 
     curl -i -u alice:alice123 http://localhost:8080/api/tasks
     curl -i -u alice:alice123 http://localhost:8080/api/admin/stats
@@ -33,7 +33,7 @@ La seconde route apparaît dans l’exercice 5.
 - 204 : tâche supprimée.
 - 400 : données de tâche invalides.
 - 401 : authentification manquante ou incorrecte.
-- 403 : rôle insuffisant.
-- 404 : tâche ou route absente.
+- 403 : refus de sécurité, notamment rôle insuffisant ; avant l’exercice 4, une mutation sans jeton CSRF renvoie aussi 403 avec ou sans compte.
+- 404 : tâche ou route absente, si la sécurité autorise la requête.
 
 Les comptes sont fictifs et réservés au TP local. HTTP Basic ne chiffre pas les mots de passe ; ne l’utilisez pas sur un réseau non chiffré avec de vrais identifiants.

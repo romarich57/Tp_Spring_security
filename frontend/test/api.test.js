@@ -35,6 +35,6 @@ test("apiRequest envoie Basic et JSON sans persister de cookie", async () => {
 
 test("les erreurs d'authentification sont présentées clairement", () => {
   assert.match(getErrorMessage({ status: 401 }), /authentification requise/);
-  assert.match(getErrorMessage({ status: 403 }), /rôle nécessaire/);
+  assert.match(getErrorMessage({ status: 403 }), /accès refusé/);
   assert.match(getErrorMessage({ status: 404 }), /n’existe pas/);
 });

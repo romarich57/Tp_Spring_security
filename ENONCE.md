@@ -4,8 +4,8 @@ Spring Security est installé. En HTTP Basic, la configuration par défaut prot�
 
 | Utilisateur | Mot de passe local | Rôle |
 | --- | --- | --- |
-| Alice | alice123 | USER |
-| Bob | bob123 | ADMIN |
+| alice | alice123 | USER |
+| bob | bob123 | ADMIN |
 
 ## Travail demandé
 
