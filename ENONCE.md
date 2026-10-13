@@ -1,21 +1,32 @@
-# Exercice 1 — Observer une faille de securite (10 min)
+# Exercice 1 — Auditer une API métier ouverte (10 min)
 
-Cette etape est **une analyse, sans modification de code**.
+Planora est un gestionnaire de tâches relié à une API Spring Boot. La fonctionnalité métier est déjà prête : dans cette étape, observez qui peut l’utiliser avant l’ajout de Spring Security.
 
-## TODO 1.1 — Constater les trois comportements
+## 1. Lancer et parcourir l’application
 
-1. Lancez `mvn spring-boot:run`.
-2. Sans `Authorization`, testez `GET /api/public/info`, `GET /api/tasks` et `GET /api/admin/stats`.
-3. Reportez codes HTTP et reponses dans [la feuille a completer](docs/reponses/EXERCICE_1_A_COMPLETER.md).
+1. Démarrez Spring avec mvn spring-boot:run.
+2. Dans un autre terminal, démarrez React : cd frontend, npm install, npm run dev.
+3. Ouvrez http://localhost:5173 et manipulez une tâche : créez-la, modifiez-la, terminez-la et supprimez-la.
+4. Ouvrez Statistiques et notez les valeurs renvoyées par l’API.
 
-## TODO 1.2 — Identifier les responsabilites
+## 2. Constater les accès sans compte
 
-1. Lisez `controller/PublicController.java`, `controller/TaskController.java` et `controller/AdminController.java`.
-2. Regardez `service/TaskService.java` et `service/StatisticsService.java`.
-3. Expliquez pourquoi une URL contenant `admin` n'empeche pas un visiteur anonyme de lire les statistiques.
+Sans renseigner d’identifiants, utilisez l’application et les requêtes de requests.http. Vérifiez que vous pouvez :
 
-## TODO 1.3 — Proposer les acces attendus
+- lire GET /api/tasks ;
+- créer, modifier, terminer et supprimer une tâche ;
+- lire GET /api/admin/stats ;
+- lire GET /api/public/info.
 
-Pour chaque route, indiquez si elle doit etre publique, ouverte aux utilisateurs connectes ou reservee aux ADMIN. Expliquez la difference entre authentification et autorisation.
+Reportez les réponses dans docs/reponses/EXERCICE_1_A_COMPLETER.md.
 
-**Ne modifiez pas les fichiers Java.** La correction d'analyse sera dans `Tp_version2/docs/corrections/EXERCICE_1.md`.
+## 3. Analyser les responsabilités
+
+Lisez TaskController, TaskService, AdminController et StatisticsService. Expliquez :
+
+1. quelles opérations métier sont disponibles ;
+2. pourquoi le nom /api/admin/stats n’empêche pas un visiteur de lire les chiffres ;
+3. quelles routes devraient rester publiques, exiger une connexion ou demander le rôle ADMIN ;
+4. la différence entre authentification et autorisation.
+
+Cette première étape est une analyse : ne modifiez pas le backend. L’exercice suivant ajoute Spring Security. React est le client métier du TP et reste identique dans toutes les branches.
