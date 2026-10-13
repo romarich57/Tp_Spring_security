@@ -1,30 +1,63 @@
-# Exercice 3 — Déclarer Alice et Bob (15 min)
+# Exercice 3 — Déclarer les comptes avec BCrypt (15 min)
 
-Spring Security est installé. En HTTP Basic, la configuration par défaut protège déjà le CRUD de Planora, les statistiques et les informations publiques. Remplacez maintenant le compte généré par deux identités pédagogiques.
+**Branche :** `Tp_version3`
 
-| Utilisateur | Mot de passe local | Rôle |
+**Fichier à modifier :** `src/main/java/fr/tpspringsecurity/config/UserConfig.java` uniquement.
+
+## Objectif
+
+Remplacer l’utilisateur temporaire créé par Spring Security par deux comptes de démonstration. Déclarer leurs rôles et encoder leurs mots de passe avec BCrypt. À cette étape, vous mettez en place les identités ; vous ne définissez pas les routes autorisées pour chaque rôle. Même si Bob a le rôle ADMIN, Alice peut encore lire les statistiques jusqu’à l’exercice 4.
+
+| Identifiant | Mot de passe de démonstration | Rôle |
 | --- | --- | --- |
-| alice | alice123 | USER |
-| bob | bob123 | ADMIN |
+| `alice` | `alice123` | `USER` |
+| `bob` | `bob123` | `ADMIN` |
 
-## Travail demandé
+## TODO 3.1 — Créer un PasswordEncoder
 
-Dans src/main/java/fr/tpspringsecurity/config/UserConfig.java :
+Dans `UserConfig.java`, créez un Bean dont le type de retour est `PasswordEncoder`. Il doit retourner un `BCryptPasswordEncoder`. Ce Bean encode les mots de passe avant leur stockage et vérifie les mots de passe envoyés par la suite.
 
-1. Déclarez un PasswordEncoder qui utilise BCryptPasswordEncoder.
-2. Déclarez un UserDetailsService de type InMemoryUserDetailsManager.
-3. Construisez Alice et Bob avec User.withUsername(...), encodez leurs mots de passe et attribuez leurs rôles.
-4. Ne déclarez pas de SecurityFilterChain à cette étape : la politique par défaut reste appliquée.
+## TODO 3.2 — Créer un UserDetailsService
 
-## Vérifier dans Planora
+Ajoutez un second Bean, de type `UserDetailsService`, qui reçoit le `PasswordEncoder` en paramètre. Spring injectera automatiquement le Bean précédent. Ce service donnera à Spring Security la liste des comptes connus.
 
-1. Connectez-vous comme Alice puis comme Bob.
-2. Pour chacun, consultez la liste des tâches.
-3. Ouvrez Statistiques : les deux comptes peuvent encore y accéder.
-4. Essayez un mauvais mot de passe et observez le 401.
+## TODO 3.3 — Construire Alice et Bob
 
-Spring Security conserve sa protection CSRF par défaut à cette étape. Les mutations JSON peuvent donc répondre 403 avec un compte valide ; l’exercice 4 adaptera la configuration de cette API stateless pour les autoriser.
+Dans le Bean `UserDetailsService`, construisez les comptes avec `User.withUsername(...)`. Pour chacun :
 
-L’identité est maintenant vérifiée, mais les rôles n’imposent pas encore de différence d’accès. Une route dont le chemin contient admin n’est pas protégée par son nom. Retirez @Disabled du test exercice3AliceEtBobPeuventSeConnecter dans TaskApiSecurityTest.java après avoir terminé UserConfig.
+1. reprenez l’identifiant du tableau ;
+2. affectez le mot de passe après `encoder.encode(...)` ;
+3. déclarez le rôle avec `.roles(...)` ;
+4. terminez avec `.build()`.
 
-L’exercice suivant définira les règles d’autorisation dans SecurityFilterChain.
+Alice reçoit `USER`, Bob reçoit `ADMIN`. Ne stockez pas les mots de passe en clair. `.roles("ADMIN")` crée l’autorité `ROLE_ADMIN`.
+
+## TODO 3.4 — Les stocker en mémoire
+
+Retournez un `InMemoryUserDetailsManager` contenant Alice et Bob. Les classes utiles se trouvent dans `org.springframework.security.core.userdetails` et `org.springframework.security.crypto.password` ; `User` se trouve dans `org.springframework.security.core.userdetails.User`.
+
+Ne modifiez pas `SecurityConfig.java` : aucune règle HTTP personnalisée ne doit être ajoutée pendant cet exercice.
+
+## Vérifier les comptes
+
+Redémarrez Spring. Le compte `user` généré n’est plus celui de l’application. Connectez-vous dans Planora comme Alice puis comme Bob. Pour chaque compte, ouvrez Mes tâches et Statistiques. Essayez aussi un mauvais mot de passe.
+
+```bash
+curl -i -u alice:alice123 http://localhost:8080/api/tasks
+curl -i -u bob:bob123 http://localhost:8080/api/admin/stats
+curl -i -u alice:incorrect http://localhost:8080/api/tasks
+```
+
+Résultat attendu : les lectures réussissent pour Alice et Bob (`200`), un mot de passe invalide est refusé (`401`) et Alice peut encore lire les statistiques. Le rôle est déclaré, mais il n’est pas encore utilisé pour contrôler l’accès. Les mutations peuvent répondre `403` avec un compte valide, car la protection CSRF est encore active par défaut.
+
+## TODO 3.5 — Activer le test
+
+Dans `src/test/java/fr/tpspringsecurity/TaskApiSecurityTest.java`, retirez `@Disabled` juste au-dessus de `exercice3AliceEtBobPeuventSeConnecter`, puis lancez `mvn test`. Le test vérifie les lectures des deux comptes et le refus d’un mauvais mot de passe. Il ne teste pas l’accès aux statistiques ; vérifiez ce cas dans Planora ou avec curl.
+
+## Questions
+
+1. Pourquoi encoder le mot de passe avant de créer le compte ?
+2. Pourquoi Alice peut-elle consulter les statistiques malgré son rôle `USER` ?
+3. En quoi l’authentification diffère-t-elle de l’autorisation ?
+
+**Étape suivante :** `Tp_version4` contient les comptes déjà configurés. Vous y écrirez les règles d’accès dans `SecurityFilterChain`.

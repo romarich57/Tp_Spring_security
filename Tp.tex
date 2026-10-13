@@ -694,13 +694,21 @@ protection par défaut et remplace le compte temporaire par Alice et Bob.
 \subsection{6. Exercice 3 --- Déclarer les comptes avec BCrypt (15
 min)}\label{exercice-3-duxe9clarer-les-comptes-avec-bcrypt-15-min}
 
-\textbf{Branche :} \texttt{Tp\_version3}. \textbf{Fichier :}
-\texttt{config/UserConfig.java}.
+\textbf{Branche :} \texttt{Tp\_version3}. \textbf{Fichier à modifier :}
+\texttt{src/main/java/fr/tpspringsecurity/config/UserConfig.java}.
+
+\subsubsection{Objectif}\label{objectif-1}
+
+Remplacer le compte temporaire généré par Spring par deux comptes de TP
+définis dans l'application, puis stocker leurs mots de passe sous forme
+BCrypt. Vous configurez \textbf{qui peut s'authentifier} et les rôles de
+ces comptes. Vous ne configurez pas encore \textbf{quelles routes chaque
+rôle peut consulter} : c'est l'exercice 4.
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-Identifiant exact & Mot de passe local & Rôle \\
+Identifiant exact & Mot de passe de démonstration & Rôle à déclarer \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
@@ -710,39 +718,140 @@ Identifiant exact & Mot de passe local & Rôle \\
 \end{longtable}
 }
 
-Complétez les TODO 3.1 à 3.4 :
+\subsubsection{Avant de coder}\label{avant-de-coder}
+
+Dans cette branche, Spring Security est déjà installé et sa politique
+HTTP par défaut est active. Au début, les routes demandent un compte
+\texttt{user} généré. \texttt{UserConfig.java} est volontairement
+incomplet ; ses commentaires indiquent les TODO 3.1 à 3.4. Travaillez
+uniquement dans ce fichier. Ne créez pas de \texttt{SecurityFilterChain}
+et ne modifiez pas \texttt{SecurityConfig.java}.
+
+\subsubsection{TODO 3.1 --- Déclarer l'encodeur
+BCrypt}\label{todo-3.1-duxe9clarer-lencodeur-bcrypt}
+
+Créez un Bean de type \texttt{PasswordEncoder}. Il doit retourner une
+instance de \texttt{BCryptPasswordEncoder}. Cet objet servira à encoder
+les mots de passe au moment de créer les comptes, puis Spring s'en
+servira pour vérifier ceux saisis à la connexion.
+
+Imports à repérer : \texttt{Bean}, \texttt{PasswordEncoder} et
+\texttt{BCryptPasswordEncoder}.
+
+\subsubsection{TODO 3.2 --- Déclarer la source des
+utilisateurs}\label{todo-3.2-duxe9clarer-la-source-des-utilisateurs}
+
+Créez un Bean \texttt{UserDetailsService} qui reçoit le
+\texttt{PasswordEncoder} en paramètre :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{@Bean}
+\KeywordTok{public}\NormalTok{ UserDetailsService }\FunctionTok{userDetailsService}\OperatorTok{(}\NormalTok{PasswordEncoder encoder}\OperatorTok{)} \OperatorTok{\{}
+    \CommentTok{// Créer les deux comptes puis les stocker en mémoire.}
+\OperatorTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Spring injectera le Bean créé au TODO 3.1. La méthode doit fournir au
+système de sécurité les comptes qu'il utilisera pour authentifier les
+requêtes.
+
+\subsubsection{TODO 3.3 --- Construire les deux
+comptes}\label{todo-3.3-construire-les-deux-comptes}
+
+Dans cette méthode, construisez un \texttt{UserDetails} pour Alice et un
+pour Bob avec \texttt{User.withUsername(...)}. Pour chacun, renseignez
+l'identifiant du tableau, un mot de passe encodé et le rôle
+correspondant (\texttt{USER} ou \texttt{ADMIN}). Terminez chaque
+construction avec \texttt{.build()}.
+
+\textbf{Attention :} passez le mot de passe à
+\texttt{encoder.encode(...)} avant de l'attribuer. Ne stockez pas le
+texte \texttt{alice123} ou \texttt{bob123} directement dans l'objet
+utilisateur. Utilisez \texttt{.roles("ADMIN")} pour déclarer le rôle de
+Bob ; Spring le convertit en autorité \texttt{ROLE\_ADMIN}.
+
+Imports à repérer : \texttt{User}, \texttt{UserDetails} et
+\texttt{UserDetailsService}.
+
+\subsubsection{TODO 3.4 --- Retourner le gestionnaire en
+mémoire}\label{todo-3.4-retourner-le-gestionnaire-en-muxe9moire}
+
+Retournez un \texttt{InMemoryUserDetailsManager} contenant les deux
+objets construits. Il remplace la source d'utilisateurs automatique pour
+l'application : après redémarrage, le compte \texttt{user} généré n'est
+plus celui que vous utilisez.
+
+Import à repérer : \texttt{InMemoryUserDetailsManager}.
+
+\subsubsection{Vérifier dans Planora et avec
+l'API}\label{vuxe9rifier-dans-planora-et-avec-lapi}
+
+Redémarrez Spring. Essayez d'abord l'ancien compte \texttt{user}, puis
+connectez-vous avec Alice et Bob. Pour chacun, consultez \textbf{Mes
+tâches} et \textbf{Statistiques}. Essayez enfin Alice avec un mauvais
+mot de passe. Vous pouvez contrôler une lecture avec curl :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}i} \AttributeTok{{-}u}\NormalTok{ alice:alice123 http://localhost:8080/api/tasks}
+\ExtensionTok{curl} \AttributeTok{{-}i} \AttributeTok{{-}u}\NormalTok{ bob:bob123 http://localhost:8080/api/admin/stats}
+\ExtensionTok{curl} \AttributeTok{{-}i} \AttributeTok{{-}u}\NormalTok{ alice:incorrect http://localhost:8080/api/tasks}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Résultats à observer :} Alice et Bob obtiennent \texttt{200} sur
+les tâches et les statistiques ; le mauvais mot de passe reçoit
+\texttt{401}. Les statistiques répondent encore \texttt{200} pour Alice
+: son rôle est bien enregistré, mais aucune règle HTTP ne l'utilise
+encore. Le chemin \texttt{/admin/} ne réserve pas une route à un
+administrateur à lui seul.
+
+Les mutations peuvent répondre \texttt{403} même quand Alice ou Bob est
+authentifié. C'est la protection CSRF par défaut de cette étape, pas une
+conséquence de leur rôle. Ne changez pas CSRF ici ; l'exercice 4
+configurerа les règles HTTP et le comportement des mutations.
+
+\subsubsection{TODO 3.5 --- Activer le test
+fourni}\label{todo-3.5-activer-le-test-fourni}
+
+Dans
+\texttt{src/test/java/fr/tpspringsecurity/TaskApiSecurityTest.java},
+repérez \texttt{exercice3AliceEtBobPeuventSeConnecter}. Retirez
+\texttt{@Disabled} située juste au-dessus de cette méthode et exécutez :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mvn}\NormalTok{ test}
+\end{Highlighting}
+\end{Shaded}
+
+Ce test vérifie qu'Alice et Bob lisent la liste des tâches
+(\texttt{200}) et qu'un mauvais mot de passe pour Alice est refusé
+(\texttt{401}). Il ne vérifie pas encore que les statistiques sont
+réservées à Bob : ajoutez cette observation depuis Planora ou curl.
+
+\subsubsection{Questions de
+compréhension}\label{questions-de-compruxe9hension-1}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Déclarez un Bean \texttt{PasswordEncoder} retournant
-  \texttt{BCryptPasswordEncoder}.
+  Quel rôle joue \texttt{PasswordEncoder} à la création du compte puis
+  lors d'une connexion ?
 \item
-  Déclarez un Bean \texttt{UserDetailsService} recevant cet encodeur.
+  Le rôle \texttt{ADMIN} protège-t-il déjà \texttt{/api/admin/stats} ?
+  Justifiez avec votre observation.
 \item
-  Construisez Alice et Bob avec \texttt{User.withUsername(...)} et
-  \texttt{.roles(...)}.
-\item
-  Encodez les mots de passe avec \texttt{encoder.encode(...)} et
-  retournez un \texttt{InMemoryUserDetailsManager} contenant les deux
-  comptes.
+  Quelle différence faites-vous entre authentifier un compte et
+  autoriser ce compte à utiliser une route ?
 \end{enumerate}
 
-Ne modifiez pas les règles HTTP dans cet exercice. Redémarrez Spring,
-connectez-vous successivement avec les deux comptes et consultez les
-tâches et les statistiques. Essayez aussi un mauvais mot de passe.
-
-\textbf{Résultat attendu :} Alice et Bob lisent les tâches \textbf{et
-les statistiques} ; un mauvais mot de passe produit \texttt{401}. Les
-rôles sont déclarés mais aucune règle ne réserve encore les statistiques
-à \texttt{ADMIN}. Les mutations restent refusées avec \texttt{403} sans
-jeton CSRF.
-
-Expliquez la différence entre déclarer un rôle et imposer une
-autorisation, ainsi que l'intérêt de BCrypt. Retirez \texttt{@Disabled}
-du test \texttt{exercice3AliceEtBobPeuventSeConnecter}, puis lancez
-\texttt{mvn\ test}.
+\textbf{Pour continuer :} la branche \texttt{Tp\_version4} contient la
+correction de \texttt{UserConfig.java}. Vous y configurerez les
+autorisations HTTP.
 
 \subsection{7. Exercice 4 --- Configurer les accès HTTP (10
 min)}\label{exercice-4-configurer-les-accuxe8s-http-10-min}
