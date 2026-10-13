@@ -1,0 +1,409 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{booktabs,tabularx,array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\definecolor{codebg}{HTML}{F4F6F8}
+\definecolor{codeframe}{HTML}{D5DCE3}
+\definecolor{codekeyword}{HTML}{2457A6}
+\definecolor{codecomment}{HTML}{4D7C55}
+\definecolor{codestring}{HTML}{A3472F}
+\definecolor{codeannotation}{HTML}{7A3E9D}
+\definecolor{codenumber}{HTML}{8993A0}
+\lstdefinestyle{java}{
+  basicstyle=\small\ttfamily,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  keywordstyle=\color{codekeyword}\bfseries,
+  commentstyle=\color{codecomment}\itshape,
+  stringstyle=\color{codestring},
+  emph={Bean,Configuration,EnableWebSecurity,EnableMethodSecurity,
+        PreAuthorize,GetMapping,PasswordEncoder,UserDetails,
+        UserDetailsService,SecurityFilterChain,HttpSecurity},
+  emphstyle=\color{codeannotation}\bfseries,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  tabsize=4,
+  numbers=left,
+  numberstyle=\scriptsize\color{codenumber},
+  numbersep=8pt,
+  xleftmargin=1.4em,
+  framexleftmargin=1.1em,
+  aboveskip=0.8em,
+  belowskip=0.8em
+}
+\lstset{style=java}
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\fancyhf{}
+\lhead{TP Spring Security}
+\rhead{Corrigé enseignant}
+\cfoot{\thepage}
+
+\title{Corrigé du TP\\\large Sécurisation de l’API Planora}
+\author{Document enseignant}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Exercice 1 — Enquête sur le contrôle d’accès}
+
+\subsection{Résultats observés dans \texttt{Tp\_version1}}
+
+Toutes les opérations métier sont accessibles sans compte. Pour les requêtes valides et les identifiants de tâche existants, les réponses attendues sont :
+
+\begin{center}
+\begin{tabularx}{\linewidth}{>{\ttfamily}l c X}
+\toprule
+Requête & Statut & Résultat \\
+\midrule
+GET /api/public/info & 200 & Message d’information publique \\
+GET /api/tasks & 200 & Liste des tâches \\
+POST /api/tasks & 201 & Tâche créée \\
+PUT /api/tasks/1 & 200 & Tâche modifiée \\
+PATCH /api/tasks/1/complete & 200 & Tâche marquée terminée \\
+DELETE /api/tasks/{id} & 204 & Tâche supprimée, sans corps de réponse \\
+GET /api/admin/stats & 200 & Statistiques de l’équipe \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Une entrée invalide peut renvoyer \texttt{400}, un identifiant inexistant \texttt{404}. Pour tester DELETE sans détruire une donnée d’exemple, créer une tâche pendant l’exercice puis supprimer cette nouvelle tâche.
+
+\subsection{Réponses aux questions}
+
+\begin{enumerate}
+\item \textbf{Permissions attendues.} Une personne anonyme ne devrait pouvoir accéder qu’à l’information explicitement publique. Un membre authentifié peut consulter et gérer les tâches partagées de l’équipe. Un administrateur peut en plus consulter les statistiques administratives et, à partir de l’exercice 5, le projet confidentiel. Dans ce TP, les tâches sont partagées : aucune règle de propriété individuelle n’est prévue.
+
+\item \textbf{Lien avec OWASP A01:2025 — Broken Access Control.} Le serveur n’applique pas de contrôle d’accès aux routes métier. Un visiteur peut lire les tâches, les modifier ou les supprimer et consulter les statistiques. Par exemple, \texttt{DELETE /api/tasks/\{id\}} est accepté sans authentification ; \texttt{GET /api/admin/stats} révèle des indicateurs à un visiteur. Cela correspond à un contrôle d’accès manquant. Le nom \texttt{/admin/} dans une URL n’applique aucune permission par lui-même.
+
+Référence : \url{https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/}.
+
+\item \textbf{Risques.} Un visiteur peut accéder à des données de l’équipe, modifier les tâches ou effacer le travail existant. Il peut aussi consulter des informations d’administration. L’impact dépend des données et opérations réellement exposées.
+
+\item \textbf{Authentification et autorisation.} L’authentification vérifie l’identité présentée. L’autorisation décide si cette identité possède le droit d’effectuer une action donnée.
+
+\item \textbf{Emplacement du contrôle.} Masquer un bouton dans React ne bloque pas une requête envoyée directement à l’API avec curl ou un autre client. Les contrôles doivent être appliqués dans le backend Spring, qui reçoit toutes les requêtes et peut imposer les permissions indépendamment de l’interface.
+\end{enumerate}
+
+\section{Exercice 2 — Ajouter Spring Security}
+
+\subsection{TODO 2.1 — Dépendance Maven}
+
+Ajouter dans \texttt{pom.xml}, à l’emplacement indiqué :
+
+\begin{lstlisting}[language=XML]
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+\end{lstlisting}
+
+Ne pas renseigner de version : le parent Spring Boot gère les versions des dépendances.
+
+\subsection{TODO 2.2 à 2.4 — Comportement attendu}
+
+L’ajout du starter déclenche la configuration par défaut de Spring Security. Tant qu’aucun \texttt{UserDetailsService} personnalisé n’est fourni, Spring crée l’utilisateur \texttt{user} et affiche un mot de passe temporaire dans la console au démarrage.
+
+\begin{itemize}
+\item Une requête GET anonyme vers \texttt{/api/public/info}, \texttt{/api/tasks} ou \texttt{/api/admin/stats} reçoit \texttt{401 Unauthorized}. Par défaut, toutes les routes sont protégées ; aucune exception publique n’a encore été configurée.
+\item Une lecture avec \texttt{user} et le mot de passe affiché reçoit \texttt{200}.
+\item Les rôles USER et ADMIN ne sont pas encore distingués. Un utilisateur authentifié peut lire les tâches et les statistiques.
+\item Les mutations peuvent recevoir \texttt{403 Forbidden} faute de jeton CSRF. La protection CSRF est active par défaut et le client fourni n’envoie pas ce jeton. Ce refus n’indique pas un rôle insuffisant.
+\end{itemize}
+
+\subsection{TODO 2.5 — Test}
+
+Dans \texttt{TaskApiSecurityTest.java}, retirer \texttt{@Disabled} au-dessus de la méthode suivante :
+
+\begin{lstlisting}
+exercice2LesRoutesDemandentUneConnexion
+\end{lstlisting}
+
+Lancer ensuite \texttt{mvn test}. Le test attend \texttt{401} pour les trois lectures anonymes ; il ne couvre pas les mutations.
+
+\subsection{Réponses aux questions}
+
+\begin{enumerate}
+\item Le starter Spring Security et sa configuration automatique créent le compte temporaire lorsque l’application n’a pas de source d’utilisateurs personnalisée.
+\item Non. À ce stade, aucune règle d’autorisation par rôle n’est configurée.
+\item Le mot « public » dans le nom de la route est une convention de nommage ; Spring n’en déduit pas une permission. Il faut une règle explicite comme \texttt{permitAll()}.
+\item La lecture GET ne requiert pas de jeton CSRF, tandis qu’une requête qui modifie l’état en requiert un par défaut. Le client de TP ne le transmet pas ; Spring rejette donc la mutation avec \texttt{403}.
+\end{enumerate}
+
+\section{Exercice 3 — Comptes et BCrypt}
+
+\subsection{TODO 3.1 à 3.4 — Fichier \texttt{UserConfig.java}}
+
+La classe complète peut être écrite ainsi :
+
+\begin{lstlisting}[language=Java]
+package fr.tpspringsecurity.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+@Configuration
+public class UserConfig {
+
+    // TODO 3.1 : fournir l'encodeur utilise par Spring Security.
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // TODO 3.2 : declarer la source des comptes en memoire.
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+        // TODO 3.3 : construire Alice et Bob, avec mots de passe encodes.
+        UserDetails alice = User.withUsername("alice")
+                .password(encoder.encode("alice123"))
+                .roles("USER")
+                .build();
+
+        UserDetails bob = User.withUsername("bob")
+                .password(encoder.encode("bob123"))
+                .roles("ADMIN")
+                .build();
+
+        // TODO 3.4 : fournir les deux utilisateurs au gestionnaire en memoire.
+        return new InMemoryUserDetailsManager(alice, bob);
+    }
+}
+\end{lstlisting}
+
+\begin{description}
+\item[TODO 3.1] Le Bean \texttt{PasswordEncoder} retourne un \texttt{BCryptPasswordEncoder}.
+\item[TODO 3.2] Le Bean \texttt{UserDetailsService} reçoit cet encodeur.
+\item[TODO 3.3] Alice a le rôle \texttt{USER} et Bob le rôle \texttt{ADMIN}. Les deux mots de passe sont encodés avant stockage.
+\item[TODO 3.4] Le \texttt{InMemoryUserDetailsManager} contient les deux utilisateurs et remplace l’utilisateur temporaire.
+\end{description}
+
+Spring ajoute le préfixe \texttt{ROLE\_} aux rôles déclarés par \texttt{.roles(...)}. Ainsi, \texttt{.roles("ADMIN")} donne l’autorité \texttt{ROLE\_ADMIN}, recherchée ultérieurement par \texttt{hasRole("ADMIN")}.
+
+\subsection{TODO 3.5 — Test et résultats}
+
+Retirer \texttt{@Disabled} du test \texttt{exercice3AliceEtBobPeuventSeConnecter}, puis lancer \texttt{mvn test}. Le test vérifie que les GET des tâches fonctionnent avec les deux comptes et qu’un mauvais mot de passe produit \texttt{401}. Vérifier séparément dans Planora que les deux comptes accèdent aux statistiques.
+
+\begin{itemize}
+\item Alice : GET tâches \texttt{200}, GET statistiques \texttt{200}.
+\item Bob : GET tâches \texttt{200}, GET statistiques \texttt{200}.
+\item Mauvais mot de passe : \texttt{401}.
+\item Mutation sans jeton CSRF : peut être refusée avec \texttt{403}, avec ou sans compte.
+\end{itemize}
+
+\subsection{Réponses aux questions}
+
+BCrypt transforme le mot de passe en une empreinte non réversible avant son stockage. Lors d’une connexion, Spring compare le mot de passe présenté à l’empreinte ; il ne le déchiffre pas. Les mots de passe en clair présents dans ce TP sont uniquement des identifiants de démonstration.
+
+Alice peut lire les statistiques car son rôle est seulement déclaré ; aucune règle d’accès ne le vérifie encore. Authentifier Alice confirme son identité ; autoriser Alice à consulter une ressource dépend d’une règle qui compare ses droits à l’action demandée.
+
+\section{Exercice 4 — Autorisations HTTP}
+
+\subsection{TODO 4.1 à 4.6 — \texttt{SecurityConfig.java}}
+
+Configuration de la chaîne HTTP à réaliser en version 4 :
+
+\begin{lstlisting}[language=Java]
+package fr.tpspringsecurity.config;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+        return http
+            // TODO 4.5 : chaque requete fournit ses identifiants.
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // TODO 4.6 : choix du TP pour le client React fourni.
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // TODO 4.2 : information publique.
+                .requestMatchers(HttpMethod.GET, "/api/public/info")
+                    .permitAll()
+                // TODO 4.3 : statistiques reservees a ADMIN.
+                .requestMatchers(HttpMethod.GET, "/api/admin/**")
+                    .hasRole("ADMIN")
+                // TODO 4.4 : toutes les autres requetes sont authentifiees.
+                .anyRequest().authenticated())
+            // TODO 4.5 : activer HTTP Basic.
+            .httpBasic(withDefaults())
+            .build();
+    }
+}
+\end{lstlisting}
+
+\begin{description}
+\item[TODO 4.1] Déclarer un Bean \texttt{SecurityFilterChain} qui reçoit \texttt{HttpSecurity} et retourne la chaîne construite.
+\item[TODO 4.2] Autoriser explicitement le GET de l’information publique avec \texttt{permitAll()}.
+\item[TODO 4.3] Réserver les GET sous \texttt{/api/admin/} au rôle ADMIN avec \texttt{hasRole("ADMIN")}.
+\item[TODO 4.4] Exiger une identité pour les autres routes. Cette règle générale doit rester après les règles plus précises.
+\item[TODO 4.5] Activer HTTP Basic et choisir \texttt{SessionCreationPolicy.STATELESS}.
+\item[TODO 4.6] Désactiver CSRF pour le client local du TP, qui transmet explicitement l’en-tête \texttt{Authorization}, n’utilise pas de cookie et envoie les requêtes avec \texttt{credentials: "omit"}.
+\end{description}
+
+\textbf{Note sur CSRF.} Ce choix est propre au client fourni. HTTP Basic et une politique sans session ne protègent pas automatiquement tous les clients contre CSRF : certains navigateurs peuvent envoyer automatiquement des identifiants Basic. Si l’authentification ou le client change, il faut réévaluer cette décision. La documentation Spring Security rappelle que les applications utilisant HTTP Basic peuvent être vulnérables à CSRF : \url{https://docs.spring.io/spring-security/reference/features/exploits/csrf.html}.
+
+\subsection{Résultats attendus}
+
+\begin{center}
+\begin{tabular}{l c c c}
+\toprule
+Route & Anonyme & Alice USER & Bob ADMIN \\
+\midrule
+GET /api/public/info & 200 & 200 & 200 \\
+GET /api/tasks & 401 & 200 & 200 \\
+POST /api/tasks & 401 & 201 & 201 \\
+GET /api/admin/stats & 401 & 403 & 200 \\
+GET /api/tasks/confidential & 401 & 404 & 404 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La route confidentielle n’existe pas encore en version 4. Avec un compte valide, le filtre laisse passer la requête, puis l’absence de route produit \texttt{404}. Un visiteur est bloqué auparavant avec \texttt{401}.
+
+Pour les opérations CRUD valides, Alice et Bob peuvent créer (\texttt{201}), modifier et terminer (\texttt{200}), puis supprimer (\texttt{204}). Les statistiques sont interdites à Alice (\texttt{403}) et accessibles à Bob (\texttt{200}).
+
+\subsection{TODO 4.7 et 4.8 — Vérification}
+
+Le test \texttt{exercice4LAccesPublicEtLesDroitsAdminSontRespectes} vérifie la route publique, le refus des statistiques à Alice, leur accès à Bob et une création authentifiée par Alice. Retirer \texttt{@Disabled}, puis exécuter \texttt{mvn test}. Si le POST reçoit \texttt{403}, vérifier le TODO CSRF.
+
+\subsection{Réponses aux questions}
+
+Les matchers sont évalués dans l’ordre déclaré. Si \texttt{anyRequest()} précédait les règles précises, la configuration serait incorrecte ou les règles suivantes ne pourraient plus affiner la décision. Alice est authentifiée mais son rôle ne correspond pas à \texttt{ADMIN}, donc Spring répond \texttt{403}. \texttt{STATELESS} évite de garder une session de connexion ; le client transmet son en-tête d’authentification à chaque appel. La désactivation CSRF facilite les mutations pour ce client particulier, mais doit être réévaluée si le mode d’authentification ou de transmission change.
+
+\section{Exercice 5 — Protection d’une méthode}
+
+\subsection{État initial}
+
+La méthode et la route \texttt{GET /api/tasks/confidential} existent déjà en version 5. Elles retournent un objet \texttt{ConfidentialProject} par l’intermédiaire de \texttt{taskService.confidential()}. La règle HTTP générale exige seulement une authentification : Alice et Bob reçoivent donc tous deux \texttt{200} avant la correction ; un visiteur reçoit \texttt{401}.
+
+\subsection{TODO 5.1 — \texttt{@PreAuthorize}}
+
+Dans \texttt{TaskController.java}, importer \texttt{PreAuthorize} et activer l’annotation sur la méthode existante :
+
+\begin{lstlisting}[language=Java]
+import org.springframework.security.access.prepost.PreAuthorize;
+
+// Dans TaskController, sur la methode confidential :
+@GetMapping("/confidential")
+@PreAuthorize("hasRole('ADMIN')")
+public ConfidentialProject confidential() {
+    return taskService.confidential();
+}
+\end{lstlisting}
+
+Ne pas recréer la route ou déplacer les données dans le contrôleur. L’appel au service reste inchangé.
+
+\subsection{TODO 5.2 — \texttt{@EnableMethodSecurity}}
+
+Dans \texttt{SecurityConfig.java}, importer l’annotation et l’ajouter à la classe :
+
+\begin{lstlisting}[language=Java]
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+    // Le bean SecurityFilterChain existant ne change pas.
+}
+\end{lstlisting}
+
+\texttt{@EnableMethodSecurity} active les contrôles d’annotations de méthode, dont \texttt{@PreAuthorize}. Sans cette activation, la règle placée sur la méthode n’est pas évaluée.
+
+\subsection{TODO 5.3 — Test et résultats}
+
+Retirer \texttt{@Disabled} du test \texttt{exercice5MethodeConfidentielleReserveeAuxAdmins} puis lancer \texttt{mvn test}. Le test attend :
+
+\begin{center}
+\begin{tabular}{l c l}
+\toprule
+Profil & Statut & Explication \\
+\midrule
+Anonyme & 401 & La règle HTTP exige une authentification \\
+Alice USER & 403 & Identité reconnue, rôle insuffisant \\
+Bob ADMIN & 200 & Autorisation accordée \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Réponses aux questions}
+
+Avant la correction, la règle HTTP générale ne vérifie que l’authentification. Alice peut donc lire la note.
+
+\texttt{@EnableMethodSecurity} active l’évaluation des annotations de méthode.
+
+\texttt{SecurityFilterChain} contrôle l’accès selon la route HTTP.
+
+\texttt{@PreAuthorize} vérifie le rôle juste avant l’exécution de la méthode.
+
+Le contrôleur délègue l’accès aux données au service, qui porte la logique métier.
+
+\section{Exercice 6 — Vérification finale}
+
+\subsection{Matrice finale}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{>{\ttfamily}X c c c}
+\toprule
+Opération & Anonyme & Alice USER & Bob ADMIN \\
+\midrule
+GET /api/public/info & 200 & 200 & 200 \\
+GET /api/tasks & 401 & 200 & 200 \\
+POST /api/tasks & 401 & 201 & 201 \\
+PUT /api/tasks/\{id\} & 401 & 200 & 200 \\
+PATCH /api/tasks/\{id\}/complete & 401 & 200 & 200 \\
+DELETE /api/tasks/\{id\} & 401 & 204 & 204 \\
+GET /api/admin/stats & 401 & 403 & 200 \\
+GET /api/tasks/confidential & 401 & 403 & 200 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Les codes \texttt{401} et \texttt{403} ne sont pas interchangeables : \texttt{401} signifie que l’authentification manque ou échoue ; \texttt{403} signifie que l’identité est reconnue, mais que son autorisation est insuffisante. \texttt{201} indique une création réussie ; \texttt{204} une suppression réussie sans corps de réponse.
+
+\subsection{Réponses au bilan}
+
+\begin{enumerate}
+\item L’exercice 2 active Spring Security et l’authentification par défaut. L’exercice 3 configure Alice et Bob.
+\item L’exercice 4 ajoute les autorisations HTTP par route et par rôle.
+\item L’exercice 5 active la sécurité de méthode avec \texttt{@EnableMethodSecurity} et réserve la méthode confidentielle à ADMIN avec \texttt{@PreAuthorize}.
+\item Stocker un mot de passe en clair l’expose directement en cas d’accès aux données. BCrypt stocke une empreinte adaptative non réversible.
+\item HTTP Basic encode les identifiants en Base64, mais ne chiffre pas le transport. Cette démonstration utilise des comptes faibles et des données fictives ; elle exige HTTPS et une conception adaptée avant tout usage réel.
+\end{enumerate}
+
+\end{document}
