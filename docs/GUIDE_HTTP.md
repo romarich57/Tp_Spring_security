@@ -1,35 +1,39 @@
-# Guide de test HTTP
+# Tester l’API métier
 
-Vous pouvez utiliser **Postman**, **Insomnia**, **curl** ou directement `requests.http` dans IntelliJ IDEA Ultimate (ou VS Code avec une extension HTTP).
+Planora appelle ces mêmes routes. Pour observer les requêtes indépendamment de l’interface, utilisez requests.http, curl, Postman ou Insomnia.
 
-## Sans authentification
+## Lire et modifier les tâches
 
-```bash
-curl -i http://localhost:8080/api/public/info
-curl -i http://localhost:8080/api/tasks
-curl -i http://localhost:8080/api/admin/stats
-```
+    curl -i http://localhost:8080/api/tasks
+    curl -i -X POST http://localhost:8080/api/tasks \
+      -H 'Content-Type: application/json' \
+      -d '{"title":"Préparer la démo","description":"Réunir les captures","status":"TODO","priority":"HIGH","dueDate":"2026-10-28"}'
 
-`-i` affiche le code HTTP et les en-têtes de réponse.
+Les autres opérations sont PUT /api/tasks/{id}, PATCH /api/tasks/{id}/complete et DELETE /api/tasks/{id}.
 
-## Avec HTTP Basic (à partir de la version 4)
+## Statistiques et ressource confidentielle
 
-Dans Postman : onglet **Authorization** → **Basic Auth** → renseignez l'utilisateur et le mot de passe.
+    curl -i http://localhost:8080/api/admin/stats
+    curl -i http://localhost:8080/api/tasks/confidential
 
-Avec curl :
+La seconde route apparaît dans l’exercice 5.
 
-```bash
-curl -i -u alice:alice123 http://localhost:8080/api/tasks
-curl -i -u alice:alice123 http://localhost:8080/api/admin/stats
-curl -i -u bob:bob123 http://localhost:8080/api/admin/stats
-```
+## Avec HTTP Basic
 
-## Interpréter les statuts
+À la version 2, utilisez user avec le mot de passe affiché dans la console Spring. À partir de la version 3 :
 
-- **200 OK** : la requête est acceptée.
-- **401 Unauthorized** : aucune identité valide n'a été fournie.
-- **403 Forbidden** : identité valide, mais autorisation insuffisante.
+    curl -i -u alice:alice123 http://localhost:8080/api/tasks
+    curl -i -u alice:alice123 http://localhost:8080/api/admin/stats
+    curl -i -u bob:bob123 http://localhost:8080/api/admin/stats
 
-### Attention
+## Codes de réponse
 
-HTTP Basic envoie un mot de passe encodé en Base64 et **non chiffré** ; l'utilisation réelle nécessite HTTPS. Ce TP ne doit être exécuté qu'en local et n'utilise que des comptes fictifs.
+- 200 : requête acceptée.
+- 201 : tâche créée.
+- 204 : tâche supprimée.
+- 400 : données de tâche invalides.
+- 401 : authentification manquante ou incorrecte.
+- 403 : rôle insuffisant.
+- 404 : tâche ou route absente.
+
+Les comptes sont fictifs et réservés au TP local. HTTP Basic ne chiffre pas les mots de passe ; ne l’utilisez pas sur un réseau non chiffré avec de vrais identifiants.

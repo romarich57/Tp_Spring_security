@@ -1,52 +1,40 @@
-# TP Spring Security — Version 5 / 6
+# TP progressif — Spring Security et API de gestion de tâches
 
-**Exercice 5 : protéger une méthode avec @PreAuthorize.**
+Le dépôt contient une API Spring Boot et son client React, Planora. Le client métier est déjà en place : les étudiants font évoluer l’authentification et les autorisations du backend, en six étapes, tout en utilisant une vraie application.
 
-Cette branche est un point de reprise autonome. Elle inclut toutes les solutions antérieures, **mais pas celle de l'exercice en cours** (sauf la version 6, intégralement corrigée).
+## Démarrer
 
-## Démarrage
+Prérequis : Java 17+, Maven 3.6.3+ et Node.js 20.19+.
 
-Java 17+, Maven 3.6.3+, terminal et Postman ou curl.
+Dans deux terminaux, depuis la racine :
 
-```bash
-git clone https://github.com/romarich57/Tp_Spring_security.git
-cd Tp_Spring_security
-git switch Tp_version5
-mvn clean test
-mvn spring-boot:run
-```
+    mvn spring-boot:run
 
-- [Consignes](ENONCE.md)
-- [Plan de progression](docs/PLAN_DU_TP.md)
-- [Guide des appels HTTP](docs/GUIDE_HTTP.md)
-- [Corrections précédentes](docs/corrections/)
-- [Requêtes HTTP prêtes à l'emploi](requests.http)
+    cd frontend
+    npm install
+    npm run dev
 
-Comptes de démonstration : `alice / alice123` (USER), `bob / bob123` (ADMIN).
-**Local uniquement : ne pas utiliser ces identifiants ou HTTP Basic sans HTTPS en production.**
+Ouvrez http://localhost:5173. Vite relaie les requêtes /api vers Spring Boot sur le port 8080. Après un changement de branche, redémarrez le backend.
 
-## Interface React — disponible dès cette étape
+## Application
 
-L'interface interactive montre les **vrais statuts HTTP**. Elle est adaptée à la branche `Tp_version5` (voir `frontend/src/version.js`).
+Planora utilise les routes métier pour lister, créer, modifier, terminer et supprimer des tâches. Elle affiche aussi des statistiques calculées par l’API et une note confidentielle qui apparaît dans les dernières étapes. Les données sont conservées en mémoire et réinitialisées au redémarrage.
 
-**Terminal 1 — à la racine du dépôt :**
+Le formulaire de connexion envoie HTTP Basic aux requêtes. Les identifiants restent dans la mémoire React. Les contrôles d’accès sont configurés côté Spring.
 
-```bash
-mvn spring-boot:run
-```
+## Les six étapes
 
-**Terminal 2 — à la racine du dépôt :**
+| Branche | Sujet |
+| --- | --- |
+| Tp_version1 | Observer une API métier ouverte |
+| Tp_version2 | Ajouter Spring Security |
+| Tp_version3 | Créer Alice USER et Bob ADMIN avec BCrypt |
+| Tp_version4 | Configurer les autorisations HTTP |
+| Tp_version5 | Ajouter une ressource confidentielle protégée par méthode |
+| Tp_version6 | Valider l’ensemble avec les tests d’intégration |
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+Consultez ENONCE.md dans la branche courante, les guides de docs/ et le [guide Planora](frontend/README.md).
 
-Ouvrir **http://localhost:5173**. Prérequis supplémentaires : **Node.js 22 recommandé**.
+## Comptes de démonstration
 
-⚠️ **Après un changement de branche, arrêter puis relancer Spring Boot** : l'ancienne JVM ne charge pas automatiquement les nouveaux fichiers Java.
-
-- [Guide de l'interface React](frontend/README.md)
-- [Scénarios attendus pour chaque version](docs/SCENARIOS_DE_TEST.md)
-- [Plan et tests d'acceptation du TP](docs/PLAN_DU_TP.md)
+À partir de la version 3, Alice est alice / alice123 (USER) et Bob est bob / bob123 (ADMIN). À la version 2, Spring affiche un mot de passe temporaire pour l’utilisateur user. Ces comptes sont fictifs et réservés à l’apprentissage local.
