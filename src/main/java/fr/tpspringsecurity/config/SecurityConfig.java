@@ -3,11 +3,12 @@ package fr.tpspringsecurity.config;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Exercice 3 : ajouter ici les Beans PasswordEncoder et UserDetailsService.
- * Ne pas créer de SecurityFilterChain avant l'exercice 4.
+ * Les autorisations HTTP seront configurees pendant l'exercice 4.
+ * Exercice 3 : travailler exclusivement dans UserConfig.
+ * Tant qu'aucun SecurityFilterChain n'est declare, Spring Security
+ * applique la protection HTTP par defaut.
  */
 @Configuration
 public class SecurityConfig {
-    // TODO exercice 3 : @Bean PasswordEncoder (BCrypt)
-    // TODO exercice 3 : @Bean UserDetailsService (Alice USER, Bob ADMIN)
+    // Aucun TODO pour cette classe dans l'exercice 3.
 }
