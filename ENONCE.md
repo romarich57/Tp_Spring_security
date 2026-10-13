@@ -1,17 +1,20 @@
-# Exercice 5 — Sécurité des méthodes (10 minutes)
+# Exercice 5 — Protéger une ressource confidentielle (10 min)
 
-Les règles HTTP sont déjà actives. Il reste à protéger une fonctionnalité sensible **au niveau Java**.
+Les règles HTTP protègent déjà les tâches et les statistiques. Planora expose maintenant une note de projet confidentielle par GET /api/tasks/confidential. Cette route est authentifiée par la règle générale, mais Alice peut encore la lire : il faut contrôler son rôle au niveau de la méthode Java.
 
-## À faire
+## Ajouter la règle de méthode
 
-1. Dans `TaskController.java`, créez `GET /api/tasks/confidential`. Comme le controller declare deja `@RequestMapping("/api/tasks")`, utilisez **`@GetMapping("/confidential")`**, pas le chemin complet. La methode retourne **`taskService.confidential()`** (service metier deja fourni), et ne contient pas elle-meme les donnees.
-2. Protégez **uniquement cette méthode** avec `@PreAuthorize("hasRole('ADMIN')")`.
-3. Ajoutez `@EnableMethodSecurity` dans la configuration Spring Security.
-4. Testez sans identifiants, avec Alice et avec Bob : attendez respectivement **401**, **403** et **200**.
-5. Expliquez la différence entre `hasRole("ADMIN")` dans `SecurityFilterChain` et `@PreAuthorize` sur la méthode.
+1. Dans TaskController, activez @PreAuthorize("hasRole('ADMIN')") sur la méthode confidential().
+2. Dans config/SecurityConfig.java, activez @EnableMethodSecurity sur la configuration.
+3. Ne déplacez pas la règle de cette ressource dans les matchers HTTP : l’objectif est d’exercer la sécurité des méthodes.
 
-**Attention :** ne mettez pas `/api/tasks/confidential` dans les matchers ADMIN HTTP : le but est de prouver que la protection vient de l'annotation !
+## Vérifier l’application
 
-Avant de coder, `GET /api/tasks/confidential` n'existe pas encore : avec Alice ou Bob, l'API renvoie normalement **404** ; sans identifiants, Spring Security renvoie **401**. Lorsque les TODO sont terminés, retirez `@Disabled` du test `exercice5MethodeConfidentielleReserveeAuxAdmins` et lancez `mvn test`.
+1. Ouvrez Projet confidentiel sans compte : Spring renvoie 401.
+2. Connectez-vous comme Alice : après la correction, Spring renvoie 403.
+3. Connectez-vous comme Bob : la note JSON du projet Orion s’affiche.
+4. Vérifiez que les tâches et les statistiques continuent de respecter leurs propres règles.
 
-La branche `Tp_version6` contient l'implémentation complète et ses tests.
+Retirez @Disabled du test exercice5MethodeConfidentielleReserveeAuxAdmins dans TaskApiSecurityTest.java et lancez mvn test.
+
+Dans votre réponse, distinguez l’authentification (qui est l’utilisateur ?) de l’autorisation (a-t-il le rôle attendu ?). La version 6 contient la correction et la suite complète des tests d’intégration.
