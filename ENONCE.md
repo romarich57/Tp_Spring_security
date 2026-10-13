@@ -17,4 +17,6 @@ Dans le fichier `pom.xml`, remplacez le commentaire `TODO EXERCICE 2` par la dep
 
 Pourquoi `/api/public/info` devient-il aussi protege ? A-t-on deja implemente une restriction reservee aux administrateurs ?
 
+**Verification automatisee :** apres avoir ajoute la dependance, retirez `@Disabled` de la methode `exercice2LesRoutesDemandentUneConnexion` dans `TaskApiSecurityTest.java` puis lancez `mvn test`.
+
 **Aucune classe de configuration a coder pour cet exercice.** La solution en code et les tests d'authentification apparaissent dans `Tp_version3`.
