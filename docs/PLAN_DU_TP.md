@@ -54,3 +54,9 @@ Changer de branche nécessite de **redémarrer Spring Boot**. Le lien GitHub dan
 Les scénarios détaillés *avant/après* se trouvent dans [SCENARIOS_DE_TEST.md](SCENARIOS_DE_TEST.md).
 
 Dans les branches 2 à 5, certains tests d'acceptation portent `@Disabled`. L'étudiant doit d'abord implémenter ses TODO, puis retirer l'annotation sur le test de l'exercice courant. Les tests déjà actifs ne doivent pas échouer lorsque les TODO sont complétés. La branche 6 exécute tous les scénarios corrigés.
+
+## Avant de changer de branche : protéger son travail
+
+Les étudiants modifient des fichiers Java et Maven. Un simple `git switch` peut alors être bloqué par des modifications non enregistrées. Faites d'abord `git add -A && git commit -m "solution personnelle"` (ou `git stash push -u -m "TP"`).
+
+Arrêtez Spring Boot et Vite puis démarrez les deux serveurs sur la branche suivante. Ne supposez pas que le serveur Java recompilera automatiquement le projet à partir du nouveau checkout.
