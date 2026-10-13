@@ -1,5 +1,7 @@
 # Exercice 1 — Enquête sur le contrôle d’accès (10 min)
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Cette branche est le point de départ de l’exercice : l’API métier fonctionne, mais aucune configuration Spring Security ne s’applique encore. N’apportez pas de correction pour le moment. Il vous faut recueillir des preuves, identifier les accès inattendus et expliquer le risque.
 
 ## Piste de recherche : OWASP Top 10, A01:2025

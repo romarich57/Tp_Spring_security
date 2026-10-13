@@ -1,5 +1,7 @@
 # Planora — interface du TP Spring Security
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Planora est une application de gestion de tâches déjà fonctionnelle côté React. Le TP porte sur le backend Spring : les étudiants font évoluer l’authentification et les autorisations pendant que l’interface consomme la même API métier.
 
 ## Démarrer
