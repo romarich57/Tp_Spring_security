@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class SecurityConfig {
-    // Aucun TODO pour cette classe dans l'exercice 3.
+    // Aucune modification n'est attendue ici a cette etape.
 }
