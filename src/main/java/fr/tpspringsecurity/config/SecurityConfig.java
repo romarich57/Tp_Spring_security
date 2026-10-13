@@ -17,6 +17,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // API stateless : le client transmet HTTP Basic, sans cookie de session.
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/api/public/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/admin/**").hasRole("ADMIN")
