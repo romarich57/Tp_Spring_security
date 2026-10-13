@@ -1,26 +1,42 @@
-# TP Spring Security — Version 5 / 6
+# TP Spring Security — Version 6 / 6 (corrigé intégral)
 
-**Exercice 5 : protéger une méthode avec @PreAuthorize.**
+Cette branche contient **tous les exercices corrigés**, leurs explications Markdown et les tests HTTP automatisés. Reprenez un exercice précédent depuis `Tp_version1` à `Tp_version5`.
 
-Cette branche est un point de reprise autonome. Elle inclut toutes les solutions antérieures, **mais pas celle de l'exercice en cours** (sauf la version 6, intégralement corrigée).
+## Prérequis
 
-## Démarrage
+- Java 17+ ;
+- Maven 3.6.3+ ;
+- Postman ou curl (optionnels : les tests Maven couvrent les scénarios).
 
-Java 17+, Maven 3.6.3+, terminal et Postman ou curl.
+## Installation et lancement
 
 ```bash
 git clone https://github.com/romarich57/Tp_Spring_security.git
 cd Tp_Spring_security
-git switch Tp_version5
-mvn clean test
+git switch Tp_version6
+mvn clean verify
 mvn spring-boot:run
 ```
 
-- [Consignes](ENONCE.md)
-- [Plan de progression](docs/PLAN_DU_TP.md)
-- [Guide des appels HTTP](docs/GUIDE_HTTP.md)
-- [Corrections précédentes](docs/corrections/)
-- [Requêtes HTTP prêtes à l'emploi](requests.http)
+Application : `http://localhost:8080`.
 
-Comptes de démonstration : `alice / alice123` (USER), `bob / bob123` (ADMIN).
-**Local uniquement : ne pas utiliser ces identifiants ou HTTP Basic sans HTTPS en production.**
+## Identifiants de démonstration (uniquement en local)
+
+- Alice : `alice` / `alice123` — USER ;
+- Bob : `bob` / `bob123` — ADMIN.
+
+## Vérification manuelle
+
+```bash
+curl -i http://localhost:8080/api/public/info
+curl -i http://localhost:8080/api/tasks
+curl -i -u alice:alice123 http://localhost:8080/api/tasks
+curl -i -u alice:alice123 http://localhost:8080/api/admin/stats
+curl -i -u bob:bob123 http://localhost:8080/api/admin/stats
+curl -i -u alice:alice123 http://localhost:8080/api/tasks/confidential
+curl -i -u bob:bob123 http://localhost:8080/api/tasks/confidential
+```
+
+Consultez [le tableau de validation](ENONCE.md), [le plan](docs/PLAN_DU_TP.md) et les [corrections](docs/corrections/).
+
+**Projet pédagogique non destiné à un déploiement :** comptes en mémoire, mots de passe fixes, HTTP Basic non chiffré sur HTTP local.

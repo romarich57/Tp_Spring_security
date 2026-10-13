@@ -1,16 +1,27 @@
 @baseUrl = http://localhost:8080
 
-### Connexion obligatoire (Alice)
+### 200 - public
+GET {{baseUrl}}/api/public/info
+
+### 401 - sans identifiants
+GET {{baseUrl}}/api/tasks
+
+### 200 - Alice lit les taches
 GET {{baseUrl}}/api/tasks
 Authorization: Basic YWxpY2U6YWxpY2UxMjM=
 
-### Connexion obligatoire (Bob)
-GET {{baseUrl}}/api/admin/stats
-Authorization: Basic Ym9iOmJvYjEyMw==
-
-### Alice accède encore aux statistiques tant que l'exercice 4 n'est pas réalisé
+### 403 - Alice ne peut pas consulter les statistiques ADMIN
 GET {{baseUrl}}/api/admin/stats
 Authorization: Basic YWxpY2U6YWxpY2UxMjM=
 
-### Visiteur anonyme
-GET {{baseUrl}}/api/public/info
+### 200 - Bob voit les statistiques
+GET {{baseUrl}}/api/admin/stats
+Authorization: Basic Ym9iOmJvYjEyMw==
+
+### 403 - protection @PreAuthorize
+GET {{baseUrl}}/api/tasks/confidential
+Authorization: Basic YWxpY2U6YWxpY2UxMjM=
+
+### 200 - protection @PreAuthorize
+GET {{baseUrl}}/api/tasks/confidential
+Authorization: Basic Ym9iOmJvYjEyMw==

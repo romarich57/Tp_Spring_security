@@ -41,4 +41,13 @@ class TaskApiSecurityTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    void annotationPreAuthorizeProtegeMethode() throws Exception {
+        mvc.perform(get("/api/tasks/confidential")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/tasks/confidential").with(httpBasic("alice", "alice123")))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/tasks/confidential").with(httpBasic("bob", "bob123")))
+                .andExpect(status().isOk());
+    }
+
 }

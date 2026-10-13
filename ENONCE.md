@@ -1,15 +1,21 @@
-# Exercice 5 — Sécurité des méthodes (10 minutes)
+# Tous les exercices corrigés — Validation finale (5 minutes)
 
-Les règles HTTP sont déjà actives. Il reste à protéger une fonctionnalité sensible **au niveau Java**.
+En exécutant `mvn clean verify`, les tests automatisés doivent valider les attentes suivantes :
 
-## À faire
+| GET | Sans identifiants | Alice USER | Bob ADMIN |
+| --- | --- | --- | --- |
+| `/api/public/info` | 200 | 200 | 200 |
+| `/api/tasks` | 401 | 200 | 200 |
+| `/api/admin/stats` | 401 | 403 | 200 |
+| `/api/tasks/confidential` | 401 | 403 | 200 |
 
-1. Dans `TaskController.java`, créez `GET /api/tasks/confidential`, qui retourne la chaîne `Projet confidentiel`.
-2. Protégez **uniquement cette méthode** avec `@PreAuthorize("hasRole('ADMIN')")`.
-3. Ajoutez `@EnableMethodSecurity` dans la configuration Spring Security.
-4. Testez sans identifiants, avec Alice et avec Bob : attendez respectivement **401**, **403** et **200**.
-5. Expliquez la différence entre `hasRole("ADMIN")` dans `SecurityFilterChain` et `@PreAuthorize` sur la méthode.
+## Question d'oral
 
-**Attention :** ne mettez pas `/api/tasks/confidential` dans les matchers ADMIN HTTP : le but est de prouver que la protection vient de l'annotation !
+- Quelle différence entre 401 et 403 ?
+- À quoi sert `SecurityFilterChain` ?
+- Pourquoi encoder les mots de passe ?
+- Pourquoi `@EnableMethodSecurity` est-il indispensable à `@PreAuthorize` ?
+- Pourquoi le chemin `/api/admin/stats` ne suffit-il pas, à lui seul, à restreindre l'accès ?
+- Pourquoi HTTP Basic ne doit-il jamais exposer de vrais identifiants sur une connexion HTTP non chiffrée ?
 
-La branche `Tp_version6` contient l'implémentation complète et ses tests.
+Voir `docs/corrections/EXERCICE_1.md` jusqu'à `EXERCICE_5.md`.
