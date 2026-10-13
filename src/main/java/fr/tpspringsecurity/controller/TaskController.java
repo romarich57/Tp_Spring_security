@@ -1,35 +1,23 @@
 package fr.tpspringsecurity.controller;
 
 import java.util.List;
-
+import fr.tpspringsecurity.service.TaskService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * API fictive volontairement ouverte pour l'exercice 1.
- * Les règles de sécurité seront ajoutées dans les branches suivantes.
- */
+/** Responsabilite : HTTP des taches, sans logique metier ni regles de securite. */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/tasks")
 public class TaskController {
+    private final TaskService taskService;
 
-    @GetMapping("/public/info")
-    public String info() {
-        return "Bienvenue sur notre API";
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
 
-    @GetMapping("/tasks")
+    @GetMapping
     public List<String> tasks() {
-        return List.of(
-                "Corriger un bug",
-                "Developper une fonctionnalite",
-                "Tester l'application"
-        );
-    }
-
-    @GetMapping("/admin/stats")
-    public String stats() {
-        return "Chiffre d'affaires fictif : 150000 EUR";
+        return taskService.findAll();
     }
 }
