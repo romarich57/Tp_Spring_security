@@ -1,0 +1,10 @@
+@baseUrl = http://localhost:8080
+
+### 1. Endpoint public
+GET {{baseUrl}}/api/public/info
+
+### 2. Tâches (encore publiques au départ)
+GET {{baseUrl}}/api/tasks
+
+### 3. Statistiques ADMIN (faille à découvrir)
+GET {{baseUrl}}/api/admin/stats
