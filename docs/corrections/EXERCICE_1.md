@@ -21,3 +21,10 @@ La séparation des responsabilités existe déjà : les contrôleurs exposent HT
 La suite ajoute progressivement l’authentification, les comptes BCrypt, les autorisations par rôle puis une règle de sécurité sur une méthode.
 
 Cette application est volontairement vulnérable au début du TP et ne doit pas être déployée en production.
+
+
+## OWASP Top 10:2025 — A01 Broken Access Control
+
+Les observations de la branche 1 illustrent **A01:2025 Broken Access Control** : des requêtes API permettent à un visiteur d’accéder à des données ou d’effectuer des opérations hors des permissions prévues. Des mutations sans contrôle d’accès et l’exposition des statistiques correspondent aux exemples de contrôle d’accès manquant décrits par l’OWASP. La vérification doit être appliquée côté serveur : un contrôle dans l’interface peut être contourné par un appel direct à l’API.
+
+Référence : [OWASP Top 10:2025 — A01 Broken Access Control](https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/).
