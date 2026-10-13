@@ -1,6 +1,6 @@
-# TP Spring Security — Version 4 / 6
+# TP Spring Security — Version 5 / 6
 
-**Exercice 4 : donner à chaque endpoint sa politique d'accès.**
+**Exercice 5 : protéger une méthode avec @PreAuthorize.**
 
 Cette branche est un point de reprise autonome. Elle inclut toutes les solutions antérieures, **mais pas celle de l'exercice en cours** (sauf la version 6, intégralement corrigée).
 
@@ -11,7 +11,7 @@ Java 17+, Maven 3.6.3+, terminal et Postman ou curl.
 ```bash
 git clone https://github.com/romarich57/Tp_Spring_security.git
 cd Tp_Spring_security
-git switch Tp_version4
+git switch Tp_version5
 mvn clean test
 mvn spring-boot:run
 ```

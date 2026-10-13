@@ -1,18 +1,15 @@
-# Exercice 4 — Configurer les autorisations (10 minutes)
+# Exercice 5 — Sécurité des méthodes (10 minutes)
 
-Les deux utilisateurs Alice (USER) et Bob (ADMIN) fonctionnent déjà. Mais Alice peut encore lire les statistiques ADMIN !
+Les règles HTTP sont déjà actives. Il reste à protéger une fonctionnalité sensible **au niveau Java**.
 
-## Travail
+## À faire
 
-1. Ajoutez un Bean `SecurityFilterChain` dans `SecurityConfig`.
-2. Autorisez tout le monde sur `GET /api/public/info` avec `permitAll()`.
-3. Réservez `GET /api/admin/**` au rôle `ADMIN` avec `hasRole("ADMIN")`.
-4. Imposez une connexion sur toutes les autres requêtes avec `anyRequest().authenticated()`.
-5. Activez `httpBasic(withDefaults())`. Utilisez `SessionCreationPolicy.STATELESS` pour ce TP d'API HTTP Basic.
-6. Vérifiez 200, 401, 403 avec `curl` ou Postman.
+1. Dans `TaskController.java`, créez `GET /api/tasks/confidential`, qui retourne la chaîne `Projet confidentiel`.
+2. Protégez **uniquement cette méthode** avec `@PreAuthorize("hasRole('ADMIN')")`.
+3. Ajoutez `@EnableMethodSecurity` dans la configuration Spring Security.
+4. Testez sans identifiants, avec Alice et avec Bob : attendez respectivement **401**, **403** et **200**.
+5. Expliquez la différence entre `hasRole("ADMIN")` dans `SecurityFilterChain` et `@PreAuthorize` sur la méthode.
 
-**Conseil :** l'ordre des `requestMatchers` compte ; placez les règles spécifiques avant `anyRequest()`.
+**Attention :** ne mettez pas `/api/tasks/confidential` dans les matchers ADMIN HTTP : le but est de prouver que la protection vient de l'annotation !
 
-Les tests de cette branche démontrent volontairement le problème (Alice accède encore aux stats). Les résultats de sécurité souhaités figurent dans [le plan](docs/PLAN_DU_TP.md).
-
-Correction dans la branche `Tp_version5`.
+La branche `Tp_version6` contient l'implémentation complète et ses tests.

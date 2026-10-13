@@ -18,7 +18,7 @@ class TaskApiSecurityTest {
 
     @Test
     void sansAuthentificationTousLesEndpointsRestentProteges() throws Exception {
-        mvc.perform(get("/api/public/info")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/public/info")).andExpect(status().isOk());
         mvc.perform(get("/api/tasks")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/admin/stats")).andExpect(status().isUnauthorized());
     }
@@ -34,9 +34,9 @@ class TaskApiSecurityTest {
     }
 
     @Test
-    void politiqueAdminNonEncoreActive() throws Exception {
+    void politiqueAdminAppliquee() throws Exception {
         mvc.perform(get("/api/admin/stats").with(httpBasic("alice", "alice123")))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
         mvc.perform(get("/api/admin/stats").with(httpBasic("bob", "bob123")))
                 .andExpect(status().isOk());
     }
