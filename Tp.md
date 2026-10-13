@@ -129,26 +129,76 @@ git switch Tp_version3
 
 Les branches suivantes fournissent déjà les corrections précédentes ; il n’est pas nécessaire de reporter votre commit sur elles. Vous pouvez aussi mettre vos changements de côté avec `git stash push -m "Mon exercice"` ; ne réappliquez pas automatiquement ce stash sur la branche suivante.
 
-## 4. Exercice 1 — Auditer les accès ouverts (10 min)
+## 4. Exercice 1 — Enquête : contrôle d’accès cassé (10 min)
 
-**Branche :** `Tp_version1`. **Livrable :** `docs/reponses/EXERCICE_1_A_COMPLETER.md`. Aucun changement Java.
+**Branche :** `Tp_version1`. Dans cette première étape, ne corrigez pas le code : votre objectif est d’observer, de démontrer et d’expliquer.
 
-1. Sans saisir d’identifiants, consultez les tâches.
-2. Créez une tâche, modifiez-la, terminez-la et supprimez-la.
-3. Ouvrez les statistiques et observez leur évolution après une création.
-4. Vérifiez également l’information publique :
+### Point de départ : OWASP Top 10
+
+L’[OWASP Top 10:2025, A01 — Broken Access Control](https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/) décrit les situations où une application laisse quelqu’un agir au-delà des permissions prévues. Parmi les exemples cités : une API qui n’applique pas de contrôle aux opérations `POST`, `PUT` ou `DELETE`, ou un accès à une fonction privilégiée en appelant directement son URL. Dans cet exercice, recherchez des indices de cette catégorie dans Planora. Vous devrez établir vous-même quels accès sont problématiques et proposer les règles à appliquer.
+
+### Mener l’enquête
+
+1. Lancez Spring Boot et Planora. Restez **déconnecté**.
+2. Dans **Mes tâches**, consultez les tâches, puis créez-en une, modifiez-la, terminez-la et supprimez-la. Notez ce que l’interface vous laisse faire.
+3. Ouvrez **Statistiques**. La navigation dans React est un indice à relever, pas une preuve suffisante du contrôle d’accès.
+4. Vérifiez les requêtes directement contre l’API : observez les appels dans l’onglet **Réseau** du navigateur ou utilisez `curl`. Testez les routes listées dans la fiche ci-dessous **sans identifiants**. Pour les opérations de modification, utilisez un identifiant de tâche existant ; supprimez uniquement la tâche que vous venez de créer.
+5. Comparez ce que vous observez avec les permissions que vous estimez nécessaires pour une application d’équipe. Pour vous guider, regardez qui peut lire les tâches, modifier les données de l’équipe et consulter des statistiques d’administration.
+6. Lisez `TaskController`, `AdminController`, `TaskService` et `StatisticsService`. Repérez où sont déclarées les routes et où se trouve (ou ne se trouve pas) une vérification d’accès.
+
+L’interface publique `/api/public/info` peut être vérifiée avec `curl` ; elle n’a pas d’écran dédié dans Planora. Les réponses initiales de l’API sont observables ainsi :
 
 ```bash
-curl -i http://localhost:8080/api/public/info
 curl -i http://localhost:8080/api/tasks
 curl -i http://localhost:8080/api/admin/stats
+curl -i http://localhost:8080/api/public/info
 ```
 
-Reportez les statuts et les données observés dans la fiche de réponses. Pour le CRUD, relevez aussi `201` à la création et `204` à la suppression.
+Ne vous contentez pas de dire qu’une opération « fonctionne » : gardez le statut HTTP, le résultat visible et l’action réalisée comme éléments de preuve.
 
-Lisez `TaskController`, `TaskService`, `AdminController` et `StatisticsService`. Expliquez pourquoi un visiteur peut modifier les données, pourquoi `/admin/` ne protège rien à lui seul et quelles opérations doivent devenir publiques, authentifiées ou réservées à `ADMIN`. Définissez authentification et autorisation.
+### Fiche d’observation à compléter
 
-**Résultat attendu :** toutes les opérations métier existantes sont ouvertes. La correction de l’analyse est disponible sur la branche 2.
+La fiche ci-dessous fait partie de ce support. Complétez-la dans le PDF (ou imprimez ces pages). Pour chaque requête, notez ce que **vous** avez observé sans vous connecter. Si une réponse diffère de ce que vous attendiez, expliquez pourquoi cela vous semble important.
+
+| Requête testée sans connexion | Accessible ? | Statut HTTP | Résultat ou effet observé |
+| --- | --- | --- | --- |
+| `GET /api/tasks` | __________ | ______ | __________________________________________ |
+| `POST /api/tasks` | __________ | ______ | __________________________________________ |
+| `PUT /api/tasks/{id}` | __________ | ______ | __________________________________________ |
+| `PATCH /api/tasks/{id}/complete` | __________ | ______ | __________________________________________ |
+| `DELETE /api/tasks/{id}` | __________ | ______ | __________________________________________ |
+| `GET /api/admin/stats` | __________ | ______ | __________________________________________ |
+
+**1. Décrire les permissions.** Pour chacun des trois profils ci-dessous, indiquez les droits que l’application devrait accorder selon vous. Justifiez votre proposition.
+
+- Une personne sans compte : ____________________________________________________
+- Un membre connecté de l’équipe : ______________________________________________
+- Un administrateur : ___________________________________________________________
+
+**2. Relier les observations à OWASP A01.** Quelle différence avez-vous constatée entre les permissions que vous proposez et les accès réellement possibles ? Donnez au moins deux exemples précis, avec la requête et son résultat.
+
+______________________________________________________________________________
+
+______________________________________________________________________________
+
+**3. Expliquer le risque.** Quelles données pourraient être exposées ou quelles actions pourraient être effectuées par une personne qui ne devrait pas y avoir accès ?
+
+______________________________________________________________________________
+
+______________________________________________________________________________
+
+**4. Distinguer deux notions.** Avec vos mots, expliquez :
+
+- Authentification : ___________________________________________________________
+- Autorisation : _______________________________________________________________
+
+**5. Localiser le contrôle.** Pourquoi cacher un bouton dans React ne suffirait-il pas à protéger la route correspondante ? Dans quelle partie du projet faudrait-il appliquer le contrôle d’accès ?
+
+______________________________________________________________________________
+
+______________________________________________________________________________
+
+**Conclusion —** À partir de vos preuves, expliquez en quelques phrases pourquoi le cas observé correspond, ou non, à **A01:2025 Broken Access Control**. La branche suivante introduira la première évolution du backend ; gardez votre fiche pour comparer les résultats après les exercices.
 
 ## 5. Exercice 2 — Installer Spring Security (10 min)
 
