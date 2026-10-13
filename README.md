@@ -1,68 +1,40 @@
-# TP Spring Security — Version 6 / 6 (corrigé intégral)
+# TP progressif — Spring Security et API de gestion de tâches
 
-Cette branche contient **tous les exercices corrigés**, leurs explications Markdown et les tests HTTP automatisés. Reprenez un exercice précédent depuis `Tp_version1` à `Tp_version5`.
+Le dépôt contient une API Spring Boot et son client React, Planora. Le client métier est déjà en place : les étudiants font évoluer l’authentification et les autorisations du backend, en six étapes, tout en utilisant une vraie application.
 
-## Prérequis
+## Démarrer
 
-- Java 17+ ;
-- Maven 3.6.3+ ;
-- Postman ou curl (optionnels : les tests Maven couvrent les scénarios).
+Prérequis : Java 17+, Maven 3.6.3+ et Node.js 20.19+.
 
-## Installation et lancement
+Dans deux terminaux, depuis la racine :
 
-```bash
-git clone https://github.com/romarich57/Tp_Spring_security.git
-cd Tp_Spring_security
-git switch Tp_version6
-mvn clean verify
-mvn spring-boot:run
-```
+    mvn spring-boot:run
 
-Application : `http://localhost:8080`.
+    cd frontend
+    npm install
+    npm run dev
 
-## Identifiants de démonstration (uniquement en local)
+Ouvrez http://localhost:5173. Vite relaie les requêtes /api vers Spring Boot sur le port 8080. Après un changement de branche, redémarrez le backend.
 
-- Alice : `alice` / `alice123` — USER ;
-- Bob : `bob` / `bob123` — ADMIN.
+## Application
 
-## Vérification manuelle
+Planora utilise les routes métier pour lister, créer, modifier, terminer et supprimer des tâches. Elle affiche aussi des statistiques calculées par l’API et une note confidentielle qui apparaît dans les dernières étapes. Les données sont conservées en mémoire et réinitialisées au redémarrage.
 
-```bash
-curl -i http://localhost:8080/api/public/info
-curl -i http://localhost:8080/api/tasks
-curl -i -u alice:alice123 http://localhost:8080/api/tasks
-curl -i -u alice:alice123 http://localhost:8080/api/admin/stats
-curl -i -u bob:bob123 http://localhost:8080/api/admin/stats
-curl -i -u alice:alice123 http://localhost:8080/api/tasks/confidential
-curl -i -u bob:bob123 http://localhost:8080/api/tasks/confidential
-```
+Le formulaire de connexion envoie HTTP Basic aux requêtes. Les identifiants restent dans la mémoire React. Les contrôles d’accès sont configurés côté Spring.
 
-Consultez [le tableau de validation](ENONCE.md), [le plan](docs/PLAN_DU_TP.md) et les [corrections](docs/corrections/).
+## Les six étapes
 
-**Projet pédagogique non destiné à un déploiement :** comptes en mémoire, mots de passe fixes, HTTP Basic non chiffré sur HTTP local.
+| Branche | Sujet |
+| --- | --- |
+| Tp_version1 | Observer une API métier ouverte |
+| Tp_version2 | Ajouter Spring Security |
+| Tp_version3 | Créer Alice USER et Bob ADMIN avec BCrypt |
+| Tp_version4 | Configurer les autorisations HTTP |
+| Tp_version5 | Ajouter une ressource confidentielle protégée par méthode |
+| Tp_version6 | Valider l’ensemble avec les tests d’intégration |
 
-## Interface React — disponible dès cette étape
+Consultez ENONCE.md dans la branche courante, les guides de docs/ et le [guide Planora](frontend/README.md).
 
-L'interface interactive montre les **vrais statuts HTTP**. Elle est adaptée à la branche `Tp_version6` (voir `frontend/src/version.js`).
+## Comptes de démonstration
 
-**Terminal 1 — à la racine du dépôt :**
-
-```bash
-mvn spring-boot:run
-```
-
-**Terminal 2 — à la racine du dépôt :**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Ouvrir **http://localhost:5173**. Prérequis supplémentaires : **Node.js 22 recommandé**.
-
-⚠️ **Après un changement de branche, arrêter puis relancer Spring Boot** : l'ancienne JVM ne charge pas automatiquement les nouveaux fichiers Java.
-
-- [Guide de l'interface React](frontend/README.md)
-- [Scénarios attendus pour chaque version](docs/SCENARIOS_DE_TEST.md)
-- [Plan et tests d'acceptation du TP](docs/PLAN_DU_TP.md)
+À partir de la version 3, Alice est alice / alice123 (USER) et Bob est bob / bob123 (ADMIN). À la version 2, Spring affiche un mot de passe temporaire pour l’utilisateur user. Ces comptes sont fictifs et réservés à l’apprentissage local.
