@@ -853,119 +853,295 @@ compréhension}\label{questions-de-compruxe9hension-1}
 correction de \texttt{UserConfig.java}. Vous y configurerez les
 autorisations HTTP.
 
-\subsection{7. Exercice 4 --- Configurer les accès HTTP (10
-min)}\label{exercice-4-configurer-les-accuxe8s-http-10-min}
+\subsection{7. Exercice 4 --- Définir les autorisations HTTP (10
+min)}\label{exercice-4-duxe9finir-les-autorisations-http-10-min}
 
-\textbf{Branche :} \texttt{Tp\_version4}. \textbf{Fichier :}
-\texttt{config/SecurityConfig.java}.
+\textbf{Branche :} \texttt{Tp\_version4}. \textbf{Fichier à modifier :}
+\texttt{src/main/java/fr/tpspringsecurity/config/SecurityConfig.java}.
 
-Les comptes sont déjà corrigés. Complétez les TODO 4.1 à 4.6 :
+\subsubsection{Objectif}\label{objectif-2}
+
+Les comptes Alice (\texttt{USER}) et Bob (\texttt{ADMIN}) existent et
+peuvent tous deux lire les tâches et les statistiques. Vous allez
+maintenant faire appliquer leurs permissions par Spring Security :
+laisser une route explicitement publique, limiter les statistiques aux
+administrateurs, puis exiger une authentification pour le reste de
+l'API.
+
+Vous allez également configurer HTTP Basic sans session, et adapter CSRF
+afin que les mutations du client React fourni fonctionnent. Les comptes
+et leurs rôles restent dans \texttt{UserConfig.java}.
+
+\subsubsection{Avant de coder}\label{avant-de-coder-1}
+
+Dans \texttt{SecurityConfig.java}, les TODO 4.1 à 4.6 sont des étapes
+d'une seule chaîne de filtres. Les imports nécessaires ne sont pas tous
+présents : ajoutez-les depuis les types indiqués ci-dessous. Gardez les
+règles d'accès dans le même ordre que les étapes.
+
+\subsubsection{TODO 4.1 --- Déclarer la chaîne de
+sécurité}\label{todo-4.1-duxe9clarer-la-chauxeene-de-suxe9curituxe9}
+
+Ajoutez l'annotation \texttt{@Bean} sur une méthode qui retourne
+\texttt{SecurityFilterChain} et reçoit \texttt{HttpSecurity}. La méthode
+doit configurer puis retourner la chaîne ; c'est là que Spring décide si
+une requête anonyme ou authentifiée peut atteindre les contrôleurs.
+
+Types à importer : \texttt{Bean}, \texttt{HttpSecurity},
+\texttt{SecurityFilterChain}.
+
+\subsubsection{TODO 4.2 à 4.4 --- Définir et ordonner les règles
+d'accès}\label{todo-4.2-uxe0-4.4-duxe9finir-et-ordonner-les-ruxe8gles-daccuxe8s}
+
+Dans \texttt{authorizeHttpRequests}, ajoutez les règles dans cet ordre :
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Déclarez un Bean \texttt{SecurityFilterChain} recevant
-  \texttt{HttpSecurity}.
+  Pour \texttt{GET\ /api/public/info}, utilisez
+  \texttt{requestMatchers(HttpMethod.GET,\ "/api/public/info").permitAll()}.
 \item
-  Autorisez \texttt{GET\ /api/public/info} avec \texttt{permitAll()}.
+  Pour \texttt{GET\ /api/admin/**}, utilisez
+  \texttt{requestMatchers(HttpMethod.GET,\ "/api/admin/**").hasRole("ADMIN")}.
 \item
-  Réservez \texttt{GET\ /api/admin/**} à \texttt{hasRole("ADMIN")}.
-\item
-  Exigez \texttt{authenticated()} pour toutes les autres requêtes.
-\item
-  Activez HTTP Basic et \texttt{SessionCreationPolicy.STATELESS}.
-\item
-  Désactivez CSRF avec
-  \texttt{.csrf(csrf\ -\textgreater{}\ csrf.disable())}, puis
-  construisez la chaîne.
+  Pour toutes les requêtes restantes, utilisez
+  \texttt{anyRequest().authenticated()}.
 \end{enumerate}
 
-Déclarez les règles spécifiques avant \texttt{anyRequest()}. Les comptes
-restent dans \texttt{UserConfig}.
+Importez \texttt{HttpMethod}. Les règles précises doivent être évaluées
+avant \texttt{anyRequest()}, qui termine la liste.
+\texttt{hasRole("ADMIN")} contrôle l'autorité \texttt{ROLE\_ADMIN},
+ajoutée aux comptes avec \texttt{.roles("ADMIN")} à l'exercice
+précédent.
 
-\textbf{Choix pour ce TP local :} le client fourni envoie explicitement
-l'en-tête \texttt{Authorization}, utilise \texttt{credentials:\ "omit"}
-et n'utilise pas de cookie de session. On désactive CSRF pour permettre
-ses mutations JSON. \textbf{Une API sans état ou utilisant HTTP Basic
-n'est pas automatiquement à l'abri de CSRF} : le navigateur peut envoyer
-automatiquement des identifiants Basic dans d'autres configurations. Si
-l'authentification ou le client change, il faut réévaluer cette
-politique. Voir la
+\subsubsection{TODO 4.5 --- Configurer HTTP Basic et les
+sessions}\label{todo-4.5-configurer-http-basic-et-les-sessions}
+
+Configurez la politique de session avec
+\texttt{SessionCreationPolicy.STATELESS}, puis activez HTTP Basic avec
+\texttt{httpBasic(withDefaults())}. Chaque requête protégée doit alors
+présenter ses identifiants ; le serveur ne conserve pas une session de
+connexion entre les appels.
+
+Types à importer : \texttt{SessionCreationPolicy} et
+\texttt{withDefaults} de
+\texttt{org.springframework.security.config.Customizer}.
+
+\subsubsection{TODO 4.6 --- Adapter CSRF au client
+fourni}\label{todo-4.6-adapter-csrf-au-client-fourni}
+
+Ajoutez \texttt{.csrf(csrf\ -\textgreater{}\ csrf.disable())} dans la
+chaîne avant de la construire avec \texttt{.build()}.
+
+Ce choix permet au client de TP d'envoyer ses requêtes JSON POST, PUT,
+PATCH et DELETE avec l'en-tête \texttt{Authorization} qu'il construit
+explicitement, et sans cookie. \textbf{Ne généralisez pas cette
+désactivation à toutes les API stateless ou HTTP Basic} : le navigateur
+peut envoyer automatiquement des identifiants Basic dans d'autres
+configurations, ce qui peut exposer à CSRF. Si le mode
+d'authentification ou le client change, réévaluez la protection.
+Consultez la
 \href{https://docs.spring.io/spring-security/reference/features/exploits/csrf.html}{documentation
 Spring Security sur CSRF}.
 
-Vérifiez avec Planora :
+\subsubsection{Vérifier les permissions dans
+Planora}\label{vuxe9rifier-les-permissions-dans-planora}
+
+Redémarrez Spring puis vérifiez les cas suivants. Relevez les statuts
+dans l'onglet Réseau ; les opérations métier doivent réellement réussir
+ou être refusées par le serveur.
 
 \begin{itemize}
 \tightlist
 \item
-  Anonyme : les tâches sont refusées avec \texttt{401}.
+  \textbf{Sans connexion :} Mes tâches est refusé avec \texttt{401}. La
+  route publique \texttt{/api/public/info} doit être vérifiée avec curl
+  et renvoyer \texttt{200}.
 \item
-  Alice : création \texttt{201}, modification et clôture \texttt{200},
-  suppression \texttt{204} ; statistiques \texttt{403}.
+  \textbf{Alice :} elle peut consulter les tâches, créer (\texttt{201}),
+  modifier et terminer (\texttt{200}), puis supprimer (\texttt{204}).
+  L'ouverture des statistiques est refusée avec \texttt{403}.
 \item
-  Bob : gestion des tâches et statistiques autorisées.
+  \textbf{Bob :} il peut gérer les tâches et consulter les statistiques
+  (\texttt{200}).
 \item
-  Avec \texttt{curl}, \texttt{GET\ /api/public/info} fonctionne sans
-  identifiants.
+  \textbf{Projet confidentiel :} dans cette branche, la route n'existe
+  pas encore. Sans compte, Spring refuse d'abord la requête
+  (\texttt{401}). Avec Alice ou Bob, la requête passe le filtre HTTP,
+  puis le contrôleur absent entraîne \texttt{404}.
 \end{itemize}
 
-La route confidentielle est encore absente : un compte valide reçoit
-\texttt{404}, tandis qu'un appel anonyme est bloqué par la sécurité avec
-\texttt{401}.
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/public/info}
+\ExtensionTok{curl} \AttributeTok{{-}i} \AttributeTok{{-}u}\NormalTok{ alice:alice123 http://localhost:8080/api/admin/stats}
+\ExtensionTok{curl} \AttributeTok{{-}i} \AttributeTok{{-}u}\NormalTok{ bob:bob123 http://localhost:8080/api/admin/stats}
+\end{Highlighting}
+\end{Shaded}
 
-Retirez \texttt{@Disabled} du test
+\subsubsection{Activer le test fourni}\label{activer-le-test-fourni}
+
+Dans \texttt{TaskApiSecurityTest.java}, retirez \texttt{@Disabled}
+au-dessus de
 \texttt{exercice4LAccesPublicEtLesDroitsAdminSontRespectes}, puis lancez
-\texttt{mvn\ test}. Le test inclut une création de tâche authentifiée :
-oublier CSRF laisse cette opération en échec.
+\texttt{mvn\ test}. Le test vérifie la route publique, le refus des
+statistiques à Alice, leur accès par Bob et la création d'une tâche par
+Alice. Cette dernière requête permet aussi de vérifier que CSRF a bien
+été configuré pour le client.
 
-\subsection{8. Exercice 5 --- Protéger une méthode (10
-min)}\label{exercice-5-protuxe9ger-une-muxe9thode-10-min}
+Les autres tests actifs vérifient déjà qu'un visiteur ne lit pas les
+tâches (\texttt{401}) et que les deux comptes valides y accèdent
+(\texttt{200}).
 
-\textbf{Branche :} \texttt{Tp\_version5}. \textbf{Fichiers :}
-\texttt{controller/TaskController.java} et
-\texttt{config/SecurityConfig.java}.
-
-La route \texttt{GET\ /api/tasks/confidential} et son objet
-\texttt{ConfidentialProject} sont \textbf{déjà fournis}. Elle appelle
-\texttt{taskService.confidential()} et retourne le projet Orion, son
-client, un résumé et une note interne. Aucun endpoint métier n'est à
-créer.
+\subsubsection{Questions de
+compréhension}\label{questions-de-compruxe9hension-2}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Connectez-vous avec Alice et ouvrez Projet confidentiel : au début,
-  elle peut lire la note (\texttt{200}). La règle HTTP générale exige
-  seulement une authentification.
+  Pourquoi faut-il placer les règles publiques et ADMIN avant
+  \texttt{anyRequest()} ?
 \item
-  Activez
-  \texttt{@PreAuthorize("hasRole(\textquotesingle{}ADMIN\textquotesingle{})")}
-  sur la méthode \texttt{confidential()} de \texttt{TaskController}
-  (TODO 5.1).
+  Pourquoi Alice reçoit-elle \texttt{403} sur les statistiques, alors
+  qu'elle est authentifiée ?
 \item
-  Ajoutez \texttt{@EnableMethodSecurity} à \texttt{SecurityConfig} (TODO
-  5.2).
-\item
-  Redémarrez et vérifiez : anonyme \texttt{401}, Alice \texttt{403}, Bob
-  \texttt{200}.
+  Que changent \texttt{STATELESS} et la désactivation de CSRF pour les
+  requêtes de ce client ? Quelle précaution garder en tête si le client
+  évolue ?
 \end{enumerate}
 
-Ne créez pas de matcher HTTP spécifique pour cette route : l'exercice
-porte sur la sécurité des méthodes.
-\texttt{hasRole(\textquotesingle{}ADMIN\textquotesingle{})} vérifie
-l'autorité \texttt{ROLE\_ADMIN} créée par \texttt{.roles("ADMIN")}.
+\textbf{Pour continuer :} la branche \texttt{Tp\_version5} contient la
+chaîne HTTP complète. Vous y protégerez une méthode Java avec
+\texttt{@PreAuthorize}.
 
-Expliquez le rôle de \texttt{@EnableMethodSecurity}. Comparez cette
-protection avec les règles HTTP. Pourquoi les données restent-elles dans
-le service ?
+\subsection{\texorpdfstring{8. Exercice 5 --- Protéger une méthode avec
+\texttt{@PreAuthorize} (10
+min)}{8. Exercice 5 --- Protéger une méthode avec @PreAuthorize (10 min)}}\label{exercice-5-protuxe9ger-une-muxe9thode-avec-preauthorize-10-min}
 
-Retirez \texttt{@Disabled} du test
-\texttt{exercice5MethodeConfidentielleReserveeAuxAdmins}, puis lancez
-\texttt{mvn\ test}. Vérifiez que le CRUD et les statistiques
-fonctionnent toujours selon les règles de l'exercice 4.
+\textbf{Branche :} \texttt{Tp\_version5}. \textbf{Fichiers à modifier :}
+\texttt{src/main/java/fr/tpspringsecurity/controller/TaskController.java}
+et
+\texttt{src/main/java/fr/tpspringsecurity/config/SecurityConfig.java}.
+
+\subsubsection{Objectif}\label{objectif-3}
+
+La chaîne HTTP de l'exercice 4 protège déjà les statistiques, mais elle
+exige seulement une authentification pour les routes restantes sous
+\texttt{/api/tasks}. Vous allez ajouter une deuxième vérification, au
+niveau d'une méthode Java, pour que seul le rôle \texttt{ADMIN} puisse
+lire le projet confidentiel.
+
+Cet exercice montre la différence entre filtrer une requête HTTP selon
+son chemin et vérifier les permissions juste avant l'exécution d'une
+méthode. La ressource métier et sa route sont déjà présentes : il ne
+faut pas les recréer.
+
+\subsubsection{État initial à
+constater}\label{uxe9tat-initial-uxe0-constater}
+
+La branche 5 expose déjà \texttt{GET\ /api/tasks/confidential}. Le
+contrôleur appelle \texttt{taskService.confidential()} et retourne un
+objet \texttt{ConfidentialProject}. À l'ouverture de la branche, la
+règle HTTP générale demande une authentification, mais Alice peut encore
+lire la note (\texttt{200}). Bob y accède également (\texttt{200}) ; un
+visiteur reçoit \texttt{401}.
+
+Connectez-vous comme Alice dans Planora et ouvrez \textbf{Projet
+confidentiel} avant la correction. Relevez le statut. Cette requête est
+votre état de comparaison.
+
+\subsubsection{TODO 5.1 --- Protéger la méthode du
+contrôleur}\label{todo-5.1-protuxe9ger-la-muxe9thode-du-contruxf4leur}
+
+Dans \texttt{TaskController.java}, repérez la méthode existante annotée
+\texttt{@GetMapping("/confidential")} et le commentaire juste au-dessus.
+
+\begin{itemize}
+\tightlist
+\item
+  Importez
+  \texttt{org.springframework.security.access.prepost.PreAuthorize} si
+  nécessaire.
+\item
+  Activez l'annotation
+  \texttt{@PreAuthorize("hasRole(\textquotesingle{}ADMIN\textquotesingle{})")}
+  sur la méthode \texttt{confidential()}.
+\item
+  Laissez son corps appeler le service comme il le fait déjà.
+\end{itemize}
+
+Ne créez pas un nouvel endpoint et ne déplacez pas la logique métier
+dans le contrôleur.
+
+\subsubsection{TODO 5.2 --- Activer la sécurité des
+méthodes}\label{todo-5.2-activer-la-suxe9curituxe9-des-muxe9thodes}
+
+Dans \texttt{SecurityConfig.java}, ajoutez
+\texttt{@EnableMethodSecurity} à la classe de configuration. Sans cette
+annotation, la vérification \texttt{@PreAuthorize} n'est pas activée.
+
+N'ajoutez pas de matcher HTTP pour \texttt{/api/tasks/confidential}. La
+règle générale existante exige déjà une identité ; dans cet exercice, la
+restriction supplémentaire au rôle ADMIN doit venir de la méthode.
+
+\subsubsection{Vérifier après
+redémarrage}\label{vuxe9rifier-apruxe8s-reduxe9marrage}
+
+Réessayez la route dans Planora avec chaque identité et observez les
+réponses :
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Profil & Résultat attendu \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Sans compte & \texttt{401} --- authentification exigée par la règle
+HTTP \\
+Alice (\texttt{USER}) & \texttt{403} --- identifiée, mais le rôle ne
+suffit pas \\
+Bob (\texttt{ADMIN}) & \texttt{200} --- méthode autorisée \\
+\end{longtable}
+}
+
+\texttt{hasRole("ADMIN")} recherche l'autorité \texttt{ROLE\_ADMIN}, que
+Spring associe au rôle déclaré avec \texttt{.roles("ADMIN")}.
+
+\subsubsection{TODO 5.3 --- Activer le test
+fourni}\label{todo-5.3-activer-le-test-fourni}
+
+Dans \texttt{TaskApiSecurityTest.java}, retirez \texttt{@Disabled} juste
+au-dessus de \texttt{exercice5MethodeConfidentielleReserveeAuxAdmins},
+puis lancez \texttt{mvn\ test}. Le test vérifie les trois cas de la
+matrice (anonyme, Alice, Bob).
+
+Vérifiez aussi que Mes tâches et Statistiques conservent les droits de
+l'exercice précédent : Alice peut gérer les tâches mais reçoit
+\texttt{403} sur les statistiques ; Bob peut accéder aux deux.
+
+\subsubsection{Questions de
+compréhension}\label{questions-de-compruxe9hension-3}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Quel est l'état de l'accès d'Alice avant et après l'ajout de
+  \texttt{@PreAuthorize} ?
+\item
+  Que fait \texttt{@EnableMethodSecurity} ?
+\item
+  Quelle différence entre la règle générale \texttt{authenticated()} et
+  la vérification de rôle sur cette méthode ? Pourquoi les données
+  restent-elles dans le service ?
+\end{enumerate}
+
+\textbf{Pour continuer :} la branche \texttt{Tp\_version6} contient les
+deux annotations actives et les tests complets.
 
 \subsection{9. Exercice 6 --- Vérifier le parcours final (5
 min)}\label{exercice-6-vuxe9rifier-le-parcours-final-5-min}
