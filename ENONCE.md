@@ -1,26 +1,28 @@
-# Exercice 3 — Configurer les utilisateurs (15 min)
+# Exercice 3 — Déclarer Alice et Bob (15 min)
 
-La dépendance Spring Security est maintenant en place. L'application utilise volontairement la configuration par défaut de Spring Security, qui sécurise **tous** les endpoints.
+Spring Security est installé. En HTTP Basic, la configuration par défaut protège déjà le CRUD de Planora, les statistiques et les informations publiques. Remplacez maintenant le compte généré par deux identités pédagogiques.
 
-## Objectif
-
-Remplacer le compte généré au démarrage par deux utilisateurs en mémoire :
-
-| Login | Mot de passe (démonstration locale) | Rôle |
+| Utilisateur | Mot de passe local | Rôle |
 | --- | --- | --- |
-| `alice` | `alice123` | `USER` |
-| `bob` | `bob123` | `ADMIN` |
+| Alice | alice123 | USER |
+| Bob | bob123 | ADMIN |
 
-## Tâches
+## Travail demandé
 
-1. Dans `src/main/java/fr/tpspringsecurity/config/UserConfig.java`, déclarez un Bean `PasswordEncoder` utilisant `BCryptPasswordEncoder`.
-2. Déclarez un Bean `UserDetailsService` de type `InMemoryUserDetailsManager`.
-3. Créez Alice et Bob avec `User.withUsername(...).password(encoder.encode(...)).roles(...).build()`.
-4. Testez `curl -i -u alice:alice123 http://localhost:8080/api/tasks` puis les mêmes routes avec Bob.
-5. Expliquez pourquoi **les deux** utilisateurs peuvent accéder à `/api/admin/stats` à cette étape : l'authentification seule ne contrôle pas encore les rôles.
+Dans src/main/java/fr/tpspringsecurity/config/UserConfig.java :
 
-Indication : ajoutez les deux Beans **sans** déclarer encore de `SecurityFilterChain`. La configuration HTTP par défaut reste applicable.
+1. Déclarez un PasswordEncoder qui utilise BCryptPasswordEncoder.
+2. Déclarez un UserDetailsService de type InMemoryUserDetailsManager.
+3. Construisez Alice et Bob avec User.withUsername(...), encodez leurs mots de passe et attribuez leurs rôles.
+4. Ne déclarez pas de SecurityFilterChain à cette étape : la politique par défaut reste appliquée.
 
-**Verification automatisee :** une fois les deux comptes crees, retirez `@Disabled` de `exercice3AliceEtBobPeuventSeConnecter` dans `TaskApiSecurityTest.java` puis lancez `mvn test`.
+## Vérifier dans Planora
 
-**La correction de l'exercice 3 sera visible dans `Tp_version4`.**
+1. Connectez-vous comme Alice puis comme Bob.
+2. Pour chacun, consultez et modifiez une tâche.
+3. Ouvrez Statistiques : les deux comptes peuvent encore y accéder.
+4. Essayez un mauvais mot de passe et observez le 401.
+
+L’identité est maintenant vérifiée, mais les rôles n’imposent pas encore de différence d’accès. Une route dont le chemin contient admin n’est pas protégée par son nom. Retirez @Disabled du test exercice3AliceEtBobPeuventSeConnecter dans TaskApiSecurityTest.java après avoir terminé UserConfig.
+
+L’exercice suivant définira les règles d’autorisation dans SecurityFilterChain.
