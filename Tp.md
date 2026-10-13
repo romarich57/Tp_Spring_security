@@ -169,36 +169,29 @@ La fiche ci-dessous fait partie de ce support. Complétez-la dans le PDF (ou imp
 | `DELETE /api/tasks/{id}` | __________ | ______ | __________________________________________ |
 | `GET /api/admin/stats` | __________ | ______ | __________________________________________ |
 
-**1. Décrire les permissions.** Pour chacun des trois profils ci-dessous, indiquez les droits que l’application devrait accorder selon vous. Justifiez votre proposition.
+**1. Quels droits proposeriez-vous ?** Indiquez ce qu’une personne sans compte, un membre connecté et un administrateur devraient pouvoir faire dans cette application. Justifiez brièvement.
 
 - Une personne sans compte : ____________________________________________________
 - Un membre connecté de l’équipe : ______________________________________________
 - Un administrateur : ___________________________________________________________
 
-**2. Relier les observations à OWASP A01.** Quelle différence avez-vous constatée entre les permissions que vous proposez et les accès réellement possibles ? Donnez au moins deux exemples précis, avec la requête et son résultat.
+**2. Que vous apprend l’enquête sur OWASP A01 ?** Comparez les droits proposés aux résultats observés. Donnez deux exemples précis de requêtes qui vous semblent problématiques et expliquez le risque associé.
 
 ______________________________________________________________________________
 
 ______________________________________________________________________________
 
-**3. Expliquer le risque.** Quelles données pourraient être exposées ou quelles actions pourraient être effectuées par une personne qui ne devrait pas y avoir accès ?
+______________________________________________________________________________
+
+**3. Où faut-il vérifier les droits ?** Expliquez avec vos mots la différence entre authentification et autorisation. Pourquoi le contrôle doit-il être appliqué dans le backend, même si React peut masquer des boutons ?
 
 ______________________________________________________________________________
 
 ______________________________________________________________________________
 
-**4. Distinguer deux notions.** Avec vos mots, expliquez :
-
-- Authentification : ___________________________________________________________
-- Autorisation : _______________________________________________________________
-
-**5. Localiser le contrôle.** Pourquoi cacher un bouton dans React ne suffirait-il pas à protéger la route correspondante ? Dans quelle partie du projet faudrait-il appliquer le contrôle d’accès ?
-
 ______________________________________________________________________________
 
-______________________________________________________________________________
-
-**Conclusion —** À partir de vos preuves, expliquez en quelques phrases pourquoi le cas observé correspond, ou non, à **A01:2025 Broken Access Control**. La branche suivante introduira la première évolution du backend ; gardez votre fiche pour comparer les résultats après les exercices.
+**Conclusion —** En une phrase, reliez vos observations à **A01:2025 Broken Access Control**. Gardez cette fiche pour comparer les résultats après les exercices suivants.
 
 ## 5. Exercice 2 — Installer Spring Security (10 min)
 
