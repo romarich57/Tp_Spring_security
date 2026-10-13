@@ -17,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
+// TODO EXERCICE 5.3 : Activer @EnableMethodSecurity pour @PreAuthorize.
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean
