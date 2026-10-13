@@ -23,3 +23,29 @@ mvn spring-boot:run
 - Requêtes : `requests.http`.
 
 **Ne pas déployer en production.** Comptes et données entièrement fictifs.
+
+## Interface React — disponible dès cette étape
+
+L'interface interactive montre les **vrais statuts HTTP**. Elle est adaptée à la branche `Tp_version3` (voir `frontend/src/version.js`).
+
+**Terminal 1 — à la racine du dépôt :**
+
+```bash
+mvn spring-boot:run
+```
+
+**Terminal 2 — à la racine du dépôt :**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Ouvrir **http://localhost:5173**. Prérequis supplémentaires : **Node.js 22 recommandé**.
+
+⚠️ **Après un changement de branche, arrêter puis relancer Spring Boot** : l'ancienne JVM ne charge pas automatiquement les nouveaux fichiers Java.
+
+- [Guide de l'interface React](frontend/README.md)
+- [Scénarios attendus pour chaque version](docs/SCENARIOS_DE_TEST.md)
+- [Plan et tests d'acceptation du TP](docs/PLAN_DU_TP.md)
