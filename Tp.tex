@@ -551,36 +551,77 @@ boutons ?
 \textbf{A01:2025 Broken Access Control}. Gardez cette fiche pour
 comparer les résultats après les exercices suivants.
 
-\subsection{5. Exercice 2 --- Installer Spring Security (10
-min)}\label{exercice-2-installer-spring-security-10-min}
+\subsection{5. Exercice 2 --- Activer la protection par défaut (10
+min)}\label{exercice-2-activer-la-protection-par-duxe9faut-10-min}
 
-\textbf{Branche :} \texttt{Tp\_version2}. \textbf{Fichier :}
-\texttt{pom.xml}.
+\textbf{Branche :} \texttt{Tp\_version2}. \textbf{Fichier à modifier :}
+\texttt{pom.xml} uniquement.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Constatez que l'application est encore ouverte au début de cette
-  branche.
-\item
-  Complétez le TODO de \texttt{pom.xml} avec la dépendance indiquée
-  ci-dessous. Ne précisez pas de version : le parent Spring Boot la
-  gère.
-\item
-  Redémarrez Spring et relevez le mot de passe généré dans sa console.
-\item
-  Sans compte, ouvrez les tâches et les statistiques : les lectures JSON
-  renvoient maintenant \texttt{401}. Même \texttt{GET\ /api/public/info}
-  est protégé.
-\item
-  Saisissez \texttt{user} et le mot de passe généré dans Connexion. Les
-  lectures fonctionnent ; les mutations sans jeton CSRF renvoient
-  \texttt{403}.
-\end{enumerate}
+\subsubsection{Objectif}\label{objectif}
 
-Dépendance : \texttt{spring-boot-starter-security}.\\
-Groupe Maven : \texttt{org.springframework.boot}.
+Ajouter Spring Security au projet et observer ce que Spring Boot met en
+place automatiquement, sans écrire encore de règles personnalisées. Vous
+allez constater que la protection par défaut demande une
+authentification pour toutes les routes, même celle nommée
+\texttt{/api/public/info}. Spring crée aussi temporairement le compte
+\texttt{user} et affiche son mot de passe dans la console.
+
+À la fin de l'exercice, vous devriez pouvoir expliquer ce que la
+dépendance change, comment retrouver le compte de développement et
+pourquoi les rôles (USER/ADMIN) ne sont pas encore distingués.
+
+\subsubsection{TODO 2.1 --- Ajouter la
+dépendance}\label{todo-2.1-ajouter-la-duxe9pendance}
+
+Dans \texttt{pom.xml}, repérez le commentaire
+\texttt{TODO\ EXERCICE\ 2}. Remplacez-le par ce bloc Maven :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\textless{}}\KeywordTok{dependency}\NormalTok{\textgreater{}}
+\NormalTok{    \textless{}}\KeywordTok{groupId}\NormalTok{\textgreater{}org.springframework.boot\textless{}/}\KeywordTok{groupId}\NormalTok{\textgreater{}}
+\NormalTok{    \textless{}}\KeywordTok{artifactId}\NormalTok{\textgreater{}spring{-}boot{-}starter{-}security\textless{}/}\KeywordTok{artifactId}\NormalTok{\textgreater{}}
+\NormalTok{\textless{}/}\KeywordTok{dependency}\NormalTok{\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+N'ajoutez pas de balise \texttt{\textless{}version\textgreater{}} : le
+parent Spring Boot gère cette version. N'ajoutez pas de configuration
+Java et ne modifiez pas les contrôleurs. À cette étape, il suffit
+d'ajouter le starter.
+
+\subsubsection{TODO 2.2 --- Observer l'API sans
+identifiants}\label{todo-2.2-observer-lapi-sans-identifiants}
+
+Redémarrez Spring avec \texttt{mvn\ spring-boot:run}. Dans Planora, sans
+vous connecter, consultez \textbf{Mes tâches} puis
+\textbf{Statistiques}. Relevez les réponses dans l'onglet
+\textbf{Réseau} du navigateur. L'information \texttt{/api/public/info}
+n'a pas d'écran dans React ; vérifiez-la directement :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/public/info}
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/tasks}
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/admin/stats}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{À observer :} les requêtes de lecture renvoient
+\texttt{401\ Unauthorized}, y compris l'information publique. Expliquez
+pourquoi un nom de route contenant \texttt{public} ne suffit pas à la
+rendre accessible.
+
+\subsubsection{TODO 2.3 --- Retrouver l'identité
+temporaire}\label{todo-2.3-retrouver-lidentituxe9-temporaire}
+
+Dans la console du backend, repérez le message Spring qui affiche le
+\textbf{mot de passe généré}. Il change au démarrage : utilisez celui de
+l'exécution en cours et ne le copiez pas dans le dépôt.
+
+Dans Planora, ouvrez \textbf{Connexion}, saisissez l'identifiant
+\texttt{user} et ce mot de passe, puis consultez les tâches. Vérifiez
+aussi la requête avec curl :
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -588,18 +629,67 @@ Groupe Maven : \texttt{org.springframework.boot}.
 \end{Highlighting}
 \end{Shaded}
 
-Pourquoi le compte existe-t-il sans déclaration dans votre code ?
-Pourquoi l'information publique est-elle protégée ? Avez-vous déjà
-défini une règle \texttt{ADMIN} ?
+Remplacez \texttt{MOT\_DE\_PASSE\_GENERE} par la valeur de votre
+console. La lecture doit fonctionner après authentification. Le fait que
+la page React affiche \texttt{user} ne suffit pas à prouver la connexion
+: vérifiez la réponse de l'API.
 
-Les tests d'intégration sont dans \texttt{TaskApiSecurityTest.java},
-sous \texttt{src/test/java/fr/tpspringsecurity/}.
+\subsubsection{TODO 2.4 --- Comparer une lecture et une
+mutation}\label{todo-2.4-comparer-une-lecture-et-une-mutation}
 
-Activez le test suivant en retirant \texttt{@Disabled} :\\
-\texttt{exercice2LesRoutesDemandentUneConnexion}.
+Essayez de créer une tâche depuis Planora avec le compte \texttt{user},
+puis notez le statut HTTP. Spring Security active aussi la protection
+CSRF par défaut ; le client pédagogique n'envoie pas de jeton CSRF. Une
+mutation peut donc recevoir \texttt{403} même avec le bon mot de passe.
+Les lectures \texttt{GET}, elles, sont acceptées avec les identifiants
+valides.
 
-Exécutez \texttt{mvn\ test}. Ce test vérifie les \textbf{lectures
-anonymes}, pas les mutations.
+Ne désactivez pas CSRF dans cet exercice : cette décision fait partie de
+la configuration de l'API à l'exercice 4. Pour l'instant, distinguez le
+refus d'authentification (\texttt{401}) du refus d'une mutation sans
+jeton CSRF (\texttt{403}).
+
+\subsubsection{TODO 2.5 --- Vérifier avec le test
+fourni}\label{todo-2.5-vuxe9rifier-avec-le-test-fourni}
+
+Dans
+\texttt{src/test/java/fr/tpspringsecurity/TaskApiSecurityTest.java},
+repérez \texttt{exercice2LesRoutesDemandentUneConnexion}. Après avoir
+ajouté la dépendance, retirez l'annotation \texttt{@Disabled} juste
+au-dessus de cette méthode, puis exécutez :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mvn}\NormalTok{ test}
+\end{Highlighting}
+\end{Shaded}
+
+Le test vérifie que les trois lectures (\texttt{/api/public/info},
+\texttt{/api/tasks}, \texttt{/api/admin/stats}) refusent un visiteur
+anonyme. Il ne vérifie pas les mutations.
+
+\subsubsection{Questions de
+compréhension}\label{questions-de-compruxe9hension}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Qui crée le compte \texttt{user}, puisque vous ne l'avez pas déclaré
+  dans le code ?
+\item
+  À cette étape, quelle règle permet de distinguer un utilisateur d'un
+  administrateur ? Appuyez-vous sur ce que vous avez observé.
+\item
+  Pourquoi la route d'information publique exige-t-elle aussi une
+  authentification ?
+\item
+  Pourquoi une mutation peut-elle renvoyer \texttt{403} alors que votre
+  lecture authentifiée renvoie \texttt{200} ?
+\end{enumerate}
+
+\textbf{Pour continuer :} la branche \texttt{Tp\_version3} garde la
+protection par défaut et remplace le compte temporaire par Alice et Bob.
 
 \subsection{6. Exercice 3 --- Déclarer les comptes avec BCrypt (15
 min)}\label{exercice-3-duxe9clarer-les-comptes-avec-bcrypt-15-min}

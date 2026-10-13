@@ -1,28 +1,67 @@
-# Exercice 2 — Ajouter Spring Security (10 min)
+# Exercice 2 — Activer Spring Security (10 min)
 
-Planora utilise déjà une API CRUD complète : vous allez d’abord constater l’accès actuel, puis ajouter la première couche de protection dans le backend.
+**Branche :** `Tp_version2`
 
-## 1. Avant la correction
+**Fichier à modifier :** `pom.xml` uniquement.
 
-1. Lancez Spring Boot et Planora selon le guide frontend/README.md.
-2. Sans connexion, consultez les tâches, créez-en une et ouvrez les statistiques.
-3. Observez les réponses 200/201 : toutes les routes de l’API sont encore accessibles.
+## Objectif
 
-## 2. Ajouter la dépendance
+Ajouter Spring Security et observer sa configuration automatique par défaut. À cette étape, vous ne configurez ni les utilisateurs vous-mêmes ni les règles d’accès par rôle. Spring Boot demande une authentification pour toutes les routes et génère le compte temporaire `user`. Vous allez vérifier ce comportement avec Planora et l’API.
 
-Dans pom.xml, remplacez le commentaire de l’exercice 2 par la dépendance org.springframework.boot:spring-boot-starter-security. Sa version est gérée par le parent Spring Boot.
+## TODO 2.1 — Ajouter le starter
 
-Relancez mvn spring-boot:run et relevez dans la console le mot de passe temporaire généré pour user.
+Dans `pom.xml`, repérez `TODO EXERCICE 2`. Remplacez le commentaire par :
 
-## 3. Observer la protection par défaut
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
 
-1. Rejouez les requêtes vers /api/public/info, /api/tasks, /api/admin/stats et les opérations POST, PUT, PATCH, DELETE.
-2. Sans authentification, les lectures GET JSON doivent renvoyer 401, y compris l’information publique. Les mutations sans jeton CSRF renvoient 403, avec ou sans compte.
-3. Dans le formulaire Planora, essayez user et le mot de passe temporaire. Les lectures fonctionnent pour ce compte.
-4. Expliquez pourquoi l’ajout de la dépendance n’a pas encore créé une règle ADMIN.
+N’ajoutez pas de version : le parent Spring Boot la gère. Ne modifiez pas les classes Java.
 
-Spring Security active aussi CSRF par défaut : avec HTTP Basic, les lectures GET passent, mais les mutations sans jeton renvoient 403. L’exercice 4 adaptera cette protection au client REST stateless afin que POST, PUT, PATCH et DELETE fonctionnent.
+## TODO 2.2 — Vérifier les accès anonymes
 
-Après avoir ajouté la dépendance, retirez @Disabled du test exercice2LesRoutesDemandentUneConnexion dans TaskApiSecurityTest.java, puis lancez mvn test.
+Redémarrez Spring (`mvn spring-boot:run`). Sans vous connecter, essayez d’ouvrir Mes tâches et Statistiques dans Planora. Relevez les statuts dans l’onglet Réseau. Testez aussi les trois lectures avec curl :
 
-La prochaine étape remplace le compte généré par Alice et Bob. L’interface Planora reste inchangée.
+```bash
+curl -i http://localhost:8080/api/public/info
+curl -i http://localhost:8080/api/tasks
+curl -i http://localhost:8080/api/admin/stats
+```
+
+Notez les statuts. Pourquoi l’information nommée « publique » est-elle également concernée ?
+
+## TODO 2.3 — Utiliser le compte généré
+
+Repérez dans la console le mot de passe généré par Spring pour `user`. Dans Planora, connectez-vous avec l’identifiant `user` et ce mot de passe, puis consultez les tâches. Vérifiez le résultat directement :
+
+```bash
+curl -i -u user:MOT_DE_PASSE_GENERE http://localhost:8080/api/tasks
+```
+
+Remplacez `MOT_DE_PASSE_GENERE` par celui affiché au démarrage. Il peut changer au redémarrage.
+
+## TODO 2.4 — Observer les mutations
+
+Connecté comme `user`, essayez de créer une tâche dans Planora et relevez le statut. Les lectures GET avec les bons identifiants doivent fonctionner. Les mutations peuvent être refusées avec `403` : Spring active la protection CSRF par défaut et le client ne transmet pas de jeton CSRF. Ne désactivez pas cette protection dans cet exercice ; l’adaptation à l’API sera faite en exercice 4.
+
+## TODO 2.5 — Activer le test
+
+Dans `src/test/java/fr/tpspringsecurity/TaskApiSecurityTest.java`, retirez `@Disabled` du test `exercice2LesRoutesDemandentUneConnexion`, puis lancez :
+
+```bash
+mvn test
+```
+
+Ce test vérifie les réponses anonymes des trois requêtes GET ; il ne teste pas les mutations.
+
+## Questions
+
+1. Quel composant fournit le compte temporaire `user` ?
+2. Une règle distingue-t-elle déjà USER et ADMIN ? Comment le savez-vous ?
+3. Pourquoi `/api/public/info` demande-t-elle une authentification ?
+4. Pourquoi la création peut-elle répondre `403` alors que la lecture fonctionne ?
+
+**Étape suivante :** dans `Tp_version3`, vous remplacerez le compte généré par Alice et Bob, tout en gardant cette configuration de sécurité par défaut.
