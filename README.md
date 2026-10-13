@@ -33,7 +33,7 @@ Le formulaire de connexion envoie HTTP Basic aux requêtes. Les identifiants res
 | Tp_version5 | Protéger par méthode la ressource confidentielle déjà fournie |
 | Tp_version6 | Valider l’ensemble avec les tests d’intégration |
 
-Consultez [le support complet](Tp.md), ENONCE.md dans la branche courante, les guides de docs/ et le [guide Planora](frontend/README.md).
+Le support complet est centralisé sur la branche [main](https://github.com/romarich57/Tp_Spring_security/tree/main) : [PDF](https://github.com/romarich57/Tp_Spring_security/blob/main/Tp.pdf), [source LaTeX](https://github.com/romarich57/Tp_Spring_security/blob/main/Tp.tex) et [source Markdown](https://github.com/romarich57/Tp_Spring_security/blob/main/Tp.md). Consultez aussi ENONCE.md dans la branche courante, les guides de docs/ et le [guide Planora](frontend/README.md).
 
 ## Comptes de démonstration
 
@@ -41,4 +41,4 @@ Après l’exercice 3 (et dès le début des branches 4 à 6), Alice est alice /
 
 ## Support du TP
 
-[Tp.md](Tp.md) est la source du support complet ; [Tp.pdf](Tp.pdf) est sa version imprimable et Tp.tex sa version LaTeX. Après une modification de Tp.md, régénérez les deux fichiers avec `bash scripts/compile-tp.sh` (Pandoc et XeLaTeX requis).
+Le sujet complet et ses sources sont disponibles sur [main](https://github.com/romarich57/Tp_Spring_security/tree/main) : [PDF](https://github.com/romarich57/Tp_Spring_security/blob/main/Tp.pdf), [source LaTeX](https://github.com/romarich57/Tp_Spring_security/blob/main/Tp.tex) et [source Markdown](https://github.com/romarich57/Tp_Spring_security/blob/main/Tp.md).
