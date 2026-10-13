@@ -1,38 +1,25 @@
 package fr.tpspringsecurity.controller;
 
 import java.util.List;
-
+import fr.tpspringsecurity.service.TaskService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * API fictive volontairement ouverte pour l'exercice 1.
- * Les règles de sécurité seront ajoutées dans les branches suivantes.
- */
+/** Responsabilite : HTTP des taches, sans logique metier ni regles de securite. */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/tasks")
 public class TaskController {
+    private final TaskService taskService;
 
-    @GetMapping("/public/info")
-    public String info() {
-        return "Bienvenue sur notre API";
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
 
-    @GetMapping("/tasks")
+    @GetMapping
     public List<String> tasks() {
-        return List.of(
-                "Corriger un bug",
-                "Developper une fonctionnalite",
-                "Tester l'application"
-        );
+        return taskService.findAll();
     }
-
-    @GetMapping("/admin/stats")
-    public String stats() {
-        return "Chiffre d'affaires fictif : 150000 EUR";
-    }
-    // TODO EXERCICE 5.1 : Ajouter GET /api/tasks/confidential.
-    // TODO EXERCICE 5.2 : Proteger cette methode avec @PreAuthorize("hasRole('ADMIN')").
-    // NOTE : ce endpoint est volontairement absent jusqu'a votre implementation.
+    // TODO 5.1 : exposer GET /api/tasks/confidential depuis ce controller.
+    // TODO 5.2 : proteger cette methode avec @PreAuthorize("hasRole('ADMIN')").
 }
