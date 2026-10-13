@@ -1,6 +1,6 @@
 # Correction de l'exercice 3 — Comptes et BCrypt
 
-Dans `Tp_version4`, `SecurityConfig.java` fournit deux Beans :
+Dans `Tp_version4`, `UserConfig.java` fournit deux Beans :
 
 ```java
 @Bean
