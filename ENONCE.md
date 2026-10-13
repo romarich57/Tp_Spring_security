@@ -1,22 +1,26 @@
-# Exercice 2 — Activer Spring Security (10 min)
+# Exercice 2 — Ajouter Spring Security (10 min)
 
-La correction de l'audit est disponible dans [EXERCICE_1.md](docs/corrections/EXERCICE_1.md).
+Planora utilise déjà une API CRUD complète : vous allez d’abord constater l’accès actuel, puis ajouter la première couche de protection dans le backend.
 
-## TODO 2.1 — Ajouter la dependance
+## 1. Avant la correction
 
-Dans le fichier `pom.xml`, remplacez le commentaire `TODO EXERCICE 2` par la dependance `org.springframework.boot:spring-boot-starter-security`. La version de cette dependance est geree par le parent Spring Boot.
+1. Lancez Spring Boot et Planora selon le guide frontend/README.md.
+2. Sans connexion, consultez les tâches, créez-en une et ouvrez les statistiques.
+3. Observez les réponses 200/201 : toutes les routes de l’API sont encore accessibles.
 
-## TODO 2.2 — Observer la protection automatique
+## 2. Ajouter la dépendance
 
-1. Relancez `mvn spring-boot:run` et relevez le **mot de passe genere** dans la console.
-2. Testez les trois routes sans authentification, a l'aide de `curl -i` ou de Postman en mode Basic Auth.
-3. Notez le nouveau code HTTP de chaque route (attendu : **401** en HTTP Basic sans identifiants).
-4. Testez `curl -i -u user:MOT_DE_PASSE http://localhost:8080/api/tasks`.
+Dans pom.xml, remplacez le commentaire de l’exercice 2 par la dépendance org.springframework.boot:spring-boot-starter-security. Sa version est gérée par le parent Spring Boot.
 
-## TODO 2.3 — Expliquer
+Relancez mvn spring-boot:run et relevez dans la console le mot de passe temporaire généré pour user.
 
-Pourquoi `/api/public/info` devient-il aussi protege ? A-t-on deja implemente une restriction reservee aux administrateurs ?
+## 3. Observer la protection par défaut
 
-**Verification automatisee :** apres avoir ajoute la dependance, retirez `@Disabled` de la methode `exercice2LesRoutesDemandentUneConnexion` dans `TaskApiSecurityTest.java` puis lancez `mvn test`.
+1. Rejouez les requêtes vers /api/public/info, /api/tasks, /api/admin/stats et les opérations POST, PUT, PATCH, DELETE.
+2. Sans authentification, Spring Security doit renvoyer 401 pour toutes ces routes, y compris l’information publique.
+3. Dans le formulaire Planora, essayez user et le mot de passe temporaire. Le CRUD fonctionne de nouveau pour ce compte.
+4. Expliquez pourquoi l’ajout de la dépendance n’a pas encore créé une règle ADMIN.
 
-**Aucune classe de configuration a coder pour cet exercice.** La solution en code et les tests d'authentification apparaissent dans `Tp_version3`.
+Après avoir ajouté la dépendance, retirez @Disabled du test exercice2LesRoutesDemandentUneConnexion dans TaskApiSecurityTest.java, puis lancez mvn test.
+
+La prochaine étape remplace le compte généré par Alice et Bob. L’interface Planora reste inchangée.
