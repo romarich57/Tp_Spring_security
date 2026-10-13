@@ -13,7 +13,7 @@ Remplacer le compte généré au démarrage par deux utilisateurs en mémoire :
 
 ## Tâches
 
-1. Dans `src/main/java/fr/tpspringsecurity/config/SecurityConfig.java`, déclarez un Bean `PasswordEncoder` utilisant `BCryptPasswordEncoder`.
+1. Dans `src/main/java/fr/tpspringsecurity/config/UserConfig.java`, déclarez un Bean `PasswordEncoder` utilisant `BCryptPasswordEncoder`.
 2. Déclarez un Bean `UserDetailsService` de type `InMemoryUserDetailsManager`.
 3. Créez Alice et Bob avec `User.withUsername(...).password(encoder.encode(...)).roles(...).build()`.
 4. Testez `curl -i -u alice:alice123 http://localhost:8080/api/tasks` puis les mêmes routes avec Bob.
