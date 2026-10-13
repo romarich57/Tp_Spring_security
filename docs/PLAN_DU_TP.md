@@ -1,62 +1,59 @@
 # Parcours pédagogique — 60 minutes
 
-Chaque branche est un **point de départ autonome**, et non une livraison de toutes les réponses à l'avance.
+L’application Planora et son contrat de gestion des tâches sont déjà en place. Le TP fait évoluer le backend Spring par étapes ; les branches sont des points de départ successifs et autonomes.
 
-| Branche | Exercice à réaliser | Corrigés déjà disponibles |
+| Branche | Exercice | Évolution du backend |
 | --- | --- | --- |
-| `Tp_version1` | 1. Diagnostiquer les failles (10 min) | Aucun |
-| `Tp_version2` | 2. Ajouter Spring Security (10 min) | Exercice 1 (Markdown) |
-| `Tp_version3` | 3. Déclarer deux utilisateurs + BCrypt (15 min) | Exercices 1 et 2 |
-| `Tp_version4` | 4. Définir les autorisations HTTP (10 min) | Exercices 1 à 3 |
-| `Tp_version5` | 5. Protéger une méthode avec `@PreAuthorize` (10 min) | Exercices 1 à 4 |
-| `Tp_version6` | Tout est corrigé + tests de validation (5 min) | Exercices 1 à 5 |
+| Tp_version1 | Observer les accès ouverts (10 min) | CRUD en mémoire et statistiques accessibles anonymement |
+| Tp_version2 | Ajouter Spring Security (10 min) | Protection automatique de toutes les routes |
+| Tp_version3 | Déclarer les comptes (15 min) | Alice USER, Bob ADMIN et mots de passe BCrypt |
+| Tp_version4 | Configurer les droits HTTP (10 min) | Tâches authentifiées, statistiques ADMIN, info publique |
+| Tp_version5 | Protéger une méthode (10 min) | Note confidentielle réservée à ADMIN par @PreAuthorize |
+| Tp_version6 | Valider (5 min) | Implémentation complète et tests d’intégration |
 
-## Reprendre à une étape
+## Lancer une étape
 
-```bash
-git fetch origin
-git switch Tp_version3
-mvn clean test
-mvn spring-boot:run
-```
+    git switch Tp_version3
+    mvn spring-boot:run
 
-La branche `Tp_version3` contient **les réponses aux exercices 1 et 2**, mais **pas la solution de l'exercice 3**. Même principe aux étapes suivantes.
+Dans un autre terminal :
 
-## Endpoints étudiés
+    cd frontend
+    npm install
+    npm run dev
 
-| Méthode | Chemin | Politique finale |
+Ouvrez http://localhost:5173. Après un changement de branche, redémarrez le backend.
+
+## API métier
+
+| Méthode | Route | Opération |
 | --- | --- | --- |
-| GET | `/api/public/info` | Public |
-| GET | `/api/tasks` | Authentification requise |
-| GET | `/api/admin/stats` | Rôle ADMIN requis |
-| GET | `/api/tasks/confidential` | Rôle ADMIN avec `@PreAuthorize` (exercice 5) |
+| GET | /api/tasks | Lister les tâches |
+| POST | /api/tasks | Créer une tâche |
+| PUT | /api/tasks/{id} | Modifier une tâche |
+| PATCH | /api/tasks/{id}/complete | Terminer une tâche |
+| DELETE | /api/tasks/{id} | Supprimer une tâche |
+| GET | /api/admin/stats | Consulter les statistiques |
+| GET | /api/tasks/confidential | Lire la note interne à partir de l’exercice 5 |
+| GET | /api/public/info | Lire l’information publique |
 
-## Comptes du TP (à partir de la version 4)
+Les tâches, leur état et leur priorité sont stockés en mémoire. Un redémarrage du backend restaure les données de démonstration.
 
-- Alice — `alice` / `alice123` — rôle USER.
-- Bob — `bob` / `bob123` — rôle ADMIN.
+## Comptes de démonstration
 
-Ces identifiants sont **uniquement des données d'exercice**, jamais des identifiants de production.
+- À la version 2, Spring génère un compte temporaire et affiche son mot de passe dans la console.
+- À partir de la version 3, Alice utilise alice / alice123 avec le rôle USER.
+- À partir de la version 3, Bob utilise bob / bob123 avec le rôle ADMIN.
 
-## Bonnes pratiques
+Ces identifiants sont fictifs et destinés uniquement à l’exécution locale du TP.
 
-- Vérifiez les codes `200`, `401` et `403`.
-- Les trois premières routes sont des GET : le TP n'impose pas de désactiver CSRF.
-- Un rôle `ADMIN` déclaré avec `.roles("ADMIN")` devient l'autorité `ROLE_ADMIN`.
-- L'API utilise HTTP Basic pour isoler la pédagogie Spring Security ; la connexion JWT est hors périmètre.
+## Résultat attendu à la fin
 
-## Interface React et validation
+| Ressource | Anonyme | Alice USER | Bob ADMIN |
+| --- | ---: | ---: | ---: |
+| Informations publiques | 200 | 200 | 200 |
+| Tâches | 401 | 200 | 200 |
+| Statistiques | 401 | 403 | 200 |
+| Note confidentielle | 401 | 403 | 200 |
 
-Chaque branche contient l'interface `frontend/` adaptée à son exercice. Lancer Java avec `mvn spring-boot:run` et React avec `cd frontend && npm install && npm run dev` dans **deux terminaux**, puis ouvrir **http://localhost:5173**.
-
-Changer de branche nécessite de **redémarrer Spring Boot**. Le lien GitHub dans la navigation de React ne change pas la branche locale.
-
-Les scénarios détaillés *avant/après* se trouvent dans [SCENARIOS_DE_TEST.md](SCENARIOS_DE_TEST.md).
-
-Dans les branches 2 à 5, certains tests d'acceptation portent `@Disabled`. L'étudiant doit d'abord implémenter ses TODO, puis retirer l'annotation sur le test de l'exercice courant. Les tests déjà actifs ne doivent pas échouer lorsque les TODO sont complétés. La branche 6 exécute tous les scénarios corrigés.
-
-## Avant de changer de branche : protéger son travail
-
-Les étudiants modifient des fichiers Java et Maven. Un simple `git switch` peut alors être bloqué par des modifications non enregistrées. Faites d'abord `git add -A && git commit -m "solution personnelle"` (ou `git stash push -u -m "TP"`).
-
-Arrêtez Spring Boot et Vite puis démarrez les deux serveurs sur la branche suivante. Ne supposez pas que le serveur Java recompilera automatiquement le projet à partir du nouveau checkout.
+Les scénarios détaillés avant et après chaque exercice sont dans SCENARIOS_DE_TEST.md.
