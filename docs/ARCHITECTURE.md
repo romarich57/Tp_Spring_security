@@ -36,7 +36,7 @@ Le stockage en mémoire évite d’introduire une base de données dans ce TP. L
 | GET | /api/tasks/confidential | Lire une note interne, ajoutée à l’exercice 5 |
 | GET | /api/public/info | Lire les informations publiques |
 
-Une tâche porte un titre, une description, un état, une priorité, une échéance et une personne assignée.
+Une tâche porte un titre, une description, un état, une priorité, une échéance et une personne assignée. React permet de modifier les cinq premiers champs ; l’assignation est affichée et conservée par le serveur si elle est absente de la requête. Les tâches sont partagées par l’équipe, sans contrôle de propriété individuel.
 
 ## Responsabilités
 
@@ -61,4 +61,4 @@ Les règles d’autorisation sont toujours imposées par le backend. Masquer un 
 | Tp_version5 | Sécurité de méthode | Protéger la note confidentielle avec @PreAuthorize |
 | Tp_version6 | Validation | Vérifier le parcours complet avec des tests d’intégration |
 
-Chaque étape conserve les fonctionnalités métier déjà acquises et ajoute une notion de sécurité.
+Chaque branche est un point de départ avec les corrections antérieures. Le CRUD est fourni dès la branche 1 ; la note est fournie dès la branche 5. Les mutations sont temporairement refusées avec 403 par CSRF après les exercices 2 et 3, jusqu’à la configuration de l’exercice 4. L’information publique est vérifiée avec curl et n’a pas d’écran React.

@@ -1,0 +1,764 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+  french,
+  10pt,
+  a4paper,
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\newenvironment{Shaded}{}{}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{\textbf{#1}}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\ifLuaTeX
+\usepackage[bidi=basic,shorthands=off]{babel}
+\else
+\usepackage[bidi=default,shorthands=off]{babel}
+\fi
+\ifLuaTeX
+  \usepackage{selnolig} % disable illegal ligatures
+\fi
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdflang={fr},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\section{TP --- Sécuriser le backend d'un gestionnaire de
+tâches}\label{tp-suxe9curiser-le-backend-dun-gestionnaire-de-tuxe2ches}
+
+\textbf{Spring Boot, Spring Security et client React Planora}
+
+Durée : \textbf{60 minutes}, après une présentation théorique de 30
+minutes. Travail individuel ou en binôme. Technologies : Java 17, Maven,
+Spring Boot et React/Vite.
+
+\textbf{Nom et prénom :}
+\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots.\\
+\textbf{Groupe :}
+\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots. \textbf{Date :}
+\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots.
+
+\subsection{1. Le produit et le travail
+demandé}\label{le-produit-et-le-travail-demanduxe9}
+
+Planora est une application de gestion des tâches d'une équipe. Son
+interface React et son API métier sont déjà fournies : on peut
+consulter, créer, modifier, terminer et supprimer des tâches. Les
+statistiques proviennent des tâches réellement stockées par Spring.
+
+Le TP fait évoluer \textbf{le backend Spring}, en ajoutant
+progressivement l'authentification puis les autorisations. Utilisez
+l'application pour constater les effets de vos changements. Les règles
+d'accès doivent être imposées par Spring ; aucune modification de React
+n'est demandée.
+
+À la fin, vous saurez distinguer authentification et autorisation,
+déclarer des comptes avec BCrypt, configurer
+\texttt{SecurityFilterChain}, protéger une méthode avec
+\texttt{@PreAuthorize} et vérifier les parcours métier avec les tests et
+les réponses HTTP.
+
+Les tâches sont partagées par l'équipe : \textbf{Alice et Bob peuvent
+gérer toutes les tâches}. Le TP ne met pas en place de propriété
+individuelle des tâches. Les statistiques et le projet confidentiel sont
+réservés à Bob, administrateur.
+
+\subsubsection{Contrat de l'API}\label{contrat-de-lapi}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Méthode et route
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fonction
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Succès
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{GET\ /api/public/info} & Information publique, à consulter avec
+curl & \texttt{200}, texte \\
+\texttt{GET\ /api/tasks} & Liste des tâches & \texttt{200}, tableau
+JSON \\
+\texttt{POST\ /api/tasks} & Création & \texttt{201}, tâche JSON \\
+\texttt{PUT\ /api/tasks/\{id\}} & Modification & \texttt{200}, tâche
+JSON \\
+\texttt{PATCH\ /api/tasks/\{id\}/complete} & Passage à l'état terminé &
+\texttt{200}, tâche JSON \\
+\texttt{DELETE\ /api/tasks/\{id\}} & Suppression & \texttt{204}, sans
+corps \\
+\texttt{GET\ /api/admin/stats} & Statistiques calculées & \texttt{200},
+objet JSON \\
+\texttt{GET\ /api/tasks/confidential} & Note du projet Orion, fournie à
+partir de la branche 5 & \texttt{200}, objet JSON \\
+\end{longtable}
+}
+
+Le CRUD et les statistiques existent dès la branche 1. La route
+confidentielle est absente des branches 1 à 4 ; elle est déjà
+implémentée dans la branche 5, où il reste à la protéger.
+
+Une tâche contient \texttt{id}, \texttt{title}, \texttt{description},
+\texttt{status}, \texttt{priority}, \texttt{dueDate} et
+\texttt{assignee}. Le formulaire React permet de modifier le titre, la
+description, l'état, la priorité et l'échéance. La personne assignée est
+affichée ; elle n'est pas éditable dans ce formulaire et le serveur la
+conserve lors d'une modification.
+
+États : \texttt{TODO}, \texttt{IN\_PROGRESS}, \texttt{DONE}. Priorités :
+\texttt{LOW}, \texttt{MEDIUM}, \texttt{HIGH}. Le titre est obligatoire
+et limité à 160 caractères ; la description à 1 000 caractères ;
+l'échéance utilise le format \texttt{AAAA-MM-JJ}. Des données invalides
+renvoient \texttt{400} et un identifiant de tâche inexistant renvoie
+\texttt{404}, si les filtres de sécurité laissent passer la requête.
+
+Les données restent \textbf{en mémoire}. Un redémarrage de Spring
+restaure les trois tâches d'exemple. Au démarrage, les statistiques sont
+: 3 tâches, 1 terminée, 2 en attente, 1 de priorité haute et 33 \%
+d'achèvement. Les statistiques d'administration sont calculées sur
+toutes les tâches ; les compteurs de l'écran des tâches utilisent la
+liste chargée dans React.
+
+\subsubsection{Architecture}\label{architecture}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Partie & Responsabilité \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{frontend/src/main.jsx} & Écrans métier et formulaire de
+connexion \\
+\texttt{frontend/src/api.js} & Appels JSON et en-tête HTTP Basic \\
+\texttt{controller/} & Routes HTTP et appels des services \\
+\texttt{model/} & Objets échangés avec React \\
+\texttt{service/TaskService.java} & CRUD et stockage en mémoire \\
+\texttt{service/StatisticsService.java} & Indicateurs calculés \\
+\texttt{config/UserConfig.java} & Comptes, rôles et encodeur BCrypt \\
+\texttt{config/SecurityConfig.java} & Règles HTTP et sécurité des
+méthodes \\
+\end{longtable}
+}
+
+Les chemins Java sont relatifs à
+\texttt{src/main/java/fr/tpspringsecurity/}. Les fichiers de
+configuration apparaissent au fil des branches. La même interface React
+est présente sur les six branches.
+
+\subsection{2. Comprendre les branches}\label{comprendre-les-branches}
+
+Chaque branche est \textbf{le point de départ de son exercice}, avec les
+corrections précédentes. La branche 6 contient la solution finale. Les
+numéros ne désignent donc pas des exercices déjà terminés.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Branche
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+État initial
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Travail demandé
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Durée
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{Tp\_version1} & CRUD et statistiques ouverts & Auditer les accès
+& 10 min \\
+\texttt{Tp\_version2} & API encore ouverte, dépendance à ajouter &
+Installer Spring Security & 10 min \\
+\texttt{Tp\_version3} & Sécurité par défaut, compte généré & Déclarer
+Alice et Bob & 15 min \\
+\texttt{Tp\_version4} & Alice et Bob présents, politique par défaut &
+Configurer les droits HTTP et CSRF & 10 min \\
+\texttt{Tp\_version5} & Droits HTTP corrigés ; note lisible par tout
+compte valide & Activer la protection de méthode & 10 min \\
+\texttt{Tp\_version6} & Sécurité complète & Vérifier le parcours final &
+5 min \\
+\end{longtable}
+}
+
+Après l'exercice 2 et après l'exercice 3, les lectures demandent un
+compte valide, y compris l'information publique. Les rôles ne limitent
+pas encore les statistiques. \textbf{Sans jeton CSRF, les mutations
+renvoient \texttt{403}, même avec un compte valide et même sans compte.}
+L'exercice 4 adapte cette configuration pour permettre les mutations du
+client fourni.
+
+Le compte généré \texttt{user} apparaît après l'ajout de la dépendance
+en exercice 2 et reste présent au début de la branche 3. Alice et Bob
+existent \textbf{après la réalisation de l'exercice 3}, et dès
+l'ouverture des branches 4 à 6.
+
+\subsection{3. Préparer et lancer le
+projet}\label{pruxe9parer-et-lancer-le-projet}
+
+Prérequis : JDK 17, Maven 3.6.3 ou supérieur, Git et Node.js
+\textbf{20.19+ ou 22.12+} avec npm. Vérifiez notamment que
+\texttt{mvn\ -version} utilise le JDK attendu.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{java} \AttributeTok{{-}version}
+\ExtensionTok{mvn} \AttributeTok{{-}version}
+\ExtensionTok{node} \AttributeTok{{-}{-}version}
+\ExtensionTok{npm} \AttributeTok{{-}{-}version}
+\end{Highlighting}
+\end{Shaded}
+
+Récupérez le dépôt :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ clone https://github.com/romarich57/Tp\_Spring\_security.git}
+\BuiltInTok{cd}\NormalTok{ Tp\_Spring\_security}
+\FunctionTok{git}\NormalTok{ switch Tp\_version1}
+\end{Highlighting}
+\end{Shaded}
+
+Dans un premier terminal, à la racine :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mvn}\NormalTok{ test}
+\ExtensionTok{mvn}\NormalTok{ spring{-}boot:run}
+\end{Highlighting}
+\end{Shaded}
+
+Dans un second terminal :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ frontend}
+\ExtensionTok{npm}\NormalTok{ install}
+\ExtensionTok{npm}\NormalTok{ run dev}
+\end{Highlighting}
+\end{Shaded}
+
+Ouvrez \textbf{http://localhost:5173}. L'API écoute sur
+\textbf{http://localhost:8080}. Vite relaie \texttt{/api} vers Spring,
+ce qui permet à React de travailler sur la même origine via le proxy.
+
+\subsubsection{Utiliser Planora}\label{utiliser-planora}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Mes tâches} : consulter, rechercher, filtrer, créer, modifier,
+  terminer et supprimer.
+\item
+  \textbf{Statistiques} : consulter les indicateurs du backend.
+\item
+  \textbf{Projet confidentiel} : lire la note lorsque le backend propose
+  cette route et autorise l'accès.
+\item
+  \textbf{Connexion} : saisir le nom du compte et son mot de passe ; se
+  déconnecter pour revenir au parcours anonyme.
+\end{itemize}
+
+Le formulaire transmet les identifiants en HTTP Basic à chaque requête.
+Ils restent en mémoire React, sans cookie ni stockage local ; recharger
+la page les efface. Il n'existe pas de route de login dédiée.
+L'affichage du nom saisi ne prouve pas que le compte est valide : Spring
+vérifie les identifiants à chaque appel et peut renvoyer \texttt{401}.
+
+L'interface affiche les données et les erreurs réelles du serveur. Pour
+relever précisément un statut de succès, utilisez l'onglet Réseau du
+navigateur, \texttt{requests.http} ou \texttt{curl}. L'information
+publique n'a pas d'écran dans Planora : vérifiez-la avec \texttt{curl}.
+
+\subsubsection{Passer à la branche
+suivante}\label{passer-uxe0-la-branche-suivante}
+
+Arrêtez Spring et Vite avec \texttt{Ctrl+C}. Enregistrez les fichiers de
+votre exercice dans un commit local, puis changez de branche et relancez
+les deux serveurs. Exemple après l'exercice 2 :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{git}\NormalTok{ add pom.xml src/test/java/fr/tpspringsecurity/TaskApiSecurityTest.java}
+\FunctionTok{git}\NormalTok{ commit }\AttributeTok{{-}m} \StringTok{"Exercice 2 terminé"}
+\FunctionTok{git}\NormalTok{ switch Tp\_version3}
+\end{Highlighting}
+\end{Shaded}
+
+Les branches suivantes fournissent déjà les corrections précédentes ; il
+n'est pas nécessaire de reporter votre commit sur elles. Vous pouvez
+aussi mettre vos changements de côté avec
+\texttt{git\ stash\ push\ -m\ "Mon\ exercice"} ; ne réappliquez pas
+automatiquement ce stash sur la branche suivante.
+
+\subsection{4. Exercice 1 --- Auditer les accès ouverts (10
+min)}\label{exercice-1-auditer-les-accuxe8s-ouverts-10-min}
+
+\textbf{Branche :} \texttt{Tp\_version1}. \textbf{Livrable :}
+\texttt{docs/reponses/EXERCICE\_1\_A\_COMPLETER.md}. Aucun changement
+Java.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Sans saisir d'identifiants, consultez les tâches.
+\item
+  Créez une tâche, modifiez-la, terminez-la et supprimez-la.
+\item
+  Ouvrez les statistiques et observez leur évolution après une création.
+\item
+  Vérifiez également l'information publique :
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/public/info}
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/tasks}
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/admin/stats}
+\end{Highlighting}
+\end{Shaded}
+
+Reportez les statuts et les données observés dans la fiche de réponses.
+Pour le CRUD, relevez aussi \texttt{201} à la création et \texttt{204} à
+la suppression.
+
+Lisez \texttt{TaskController}, \texttt{TaskService},
+\texttt{AdminController} et \texttt{StatisticsService}. Expliquez
+pourquoi un visiteur peut modifier les données, pourquoi
+\texttt{/admin/} ne protège rien à lui seul et quelles opérations
+doivent devenir publiques, authentifiées ou réservées à \texttt{ADMIN}.
+Définissez authentification et autorisation.
+
+\textbf{Résultat attendu :} toutes les opérations métier existantes sont
+ouvertes. La correction de l'analyse est disponible sur la branche 2.
+
+\subsection{5. Exercice 2 --- Installer Spring Security (10
+min)}\label{exercice-2-installer-spring-security-10-min}
+
+\textbf{Branche :} \texttt{Tp\_version2}. \textbf{Fichier :}
+\texttt{pom.xml}.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Constatez que l'application est encore ouverte au début de cette
+  branche.
+\item
+  Complétez le TODO de \texttt{pom.xml} avec la dépendance indiquée
+  ci-dessous. Ne précisez pas de version : le parent Spring Boot la
+  gère.
+\item
+  Redémarrez Spring et relevez le mot de passe généré dans sa console.
+\item
+  Sans compte, ouvrez les tâches et les statistiques : les lectures JSON
+  renvoient maintenant \texttt{401}. Même \texttt{GET\ /api/public/info}
+  est protégé.
+\item
+  Saisissez \texttt{user} et le mot de passe généré dans Connexion. Les
+  lectures fonctionnent ; les mutations sans jeton CSRF renvoient
+  \texttt{403}.
+\end{enumerate}
+
+Dépendance : \texttt{spring-boot-starter-security}.\\
+Groupe Maven : \texttt{org.springframework.boot}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{curl} \AttributeTok{{-}i} \AttributeTok{{-}u}\NormalTok{ user:MOT\_DE\_PASSE\_GENERE http://localhost:8080/api/tasks}
+\end{Highlighting}
+\end{Shaded}
+
+Pourquoi le compte existe-t-il sans déclaration dans votre code ?
+Pourquoi l'information publique est-elle protégée ? Avez-vous déjà
+défini une règle \texttt{ADMIN} ?
+
+Les tests d'intégration sont dans \texttt{TaskApiSecurityTest.java},
+sous \texttt{src/test/java/fr/tpspringsecurity/}.
+
+Activez le test suivant en retirant \texttt{@Disabled} :\\
+\texttt{exercice2LesRoutesDemandentUneConnexion}.
+
+Exécutez \texttt{mvn\ test}. Ce test vérifie les \textbf{lectures
+anonymes}, pas les mutations.
+
+\subsection{6. Exercice 3 --- Déclarer les comptes avec BCrypt (15
+min)}\label{exercice-3-duxe9clarer-les-comptes-avec-bcrypt-15-min}
+
+\textbf{Branche :} \texttt{Tp\_version3}. \textbf{Fichier :}
+\texttt{config/UserConfig.java}.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Identifiant exact & Mot de passe local & Rôle \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{alice} & \texttt{alice123} & \texttt{USER} \\
+\texttt{bob} & \texttt{bob123} & \texttt{ADMIN} \\
+\end{longtable}
+}
+
+Complétez les TODO 3.1 à 3.4 :
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Déclarez un Bean \texttt{PasswordEncoder} retournant
+  \texttt{BCryptPasswordEncoder}.
+\item
+  Déclarez un Bean \texttt{UserDetailsService} recevant cet encodeur.
+\item
+  Construisez Alice et Bob avec \texttt{User.withUsername(...)} et
+  \texttt{.roles(...)}.
+\item
+  Encodez les mots de passe avec \texttt{encoder.encode(...)} et
+  retournez un \texttt{InMemoryUserDetailsManager} contenant les deux
+  comptes.
+\end{enumerate}
+
+Ne modifiez pas les règles HTTP dans cet exercice. Redémarrez Spring,
+connectez-vous successivement avec les deux comptes et consultez les
+tâches et les statistiques. Essayez aussi un mauvais mot de passe.
+
+\textbf{Résultat attendu :} Alice et Bob lisent les tâches \textbf{et
+les statistiques} ; un mauvais mot de passe produit \texttt{401}. Les
+rôles sont déclarés mais aucune règle ne réserve encore les statistiques
+à \texttt{ADMIN}. Les mutations restent refusées avec \texttt{403} sans
+jeton CSRF.
+
+Expliquez la différence entre déclarer un rôle et imposer une
+autorisation, ainsi que l'intérêt de BCrypt. Retirez \texttt{@Disabled}
+du test \texttt{exercice3AliceEtBobPeuventSeConnecter}, puis lancez
+\texttt{mvn\ test}.
+
+\subsection{7. Exercice 4 --- Configurer les accès HTTP (10
+min)}\label{exercice-4-configurer-les-accuxe8s-http-10-min}
+
+\textbf{Branche :} \texttt{Tp\_version4}. \textbf{Fichier :}
+\texttt{config/SecurityConfig.java}.
+
+Les comptes sont déjà corrigés. Complétez les TODO 4.1 à 4.6 :
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Déclarez un Bean \texttt{SecurityFilterChain} recevant
+  \texttt{HttpSecurity}.
+\item
+  Autorisez \texttt{GET\ /api/public/info} avec \texttt{permitAll()}.
+\item
+  Réservez \texttt{GET\ /api/admin/**} à \texttt{hasRole("ADMIN")}.
+\item
+  Exigez \texttt{authenticated()} pour toutes les autres requêtes.
+\item
+  Activez HTTP Basic et \texttt{SessionCreationPolicy.STATELESS}.
+\item
+  Désactivez CSRF avec
+  \texttt{.csrf(csrf\ -\textgreater{}\ csrf.disable())}, puis
+  construisez la chaîne.
+\end{enumerate}
+
+Déclarez les règles spécifiques avant \texttt{anyRequest()}. Les comptes
+restent dans \texttt{UserConfig}.
+
+\textbf{Choix pour ce TP local :} le client fourni envoie explicitement
+l'en-tête \texttt{Authorization}, utilise \texttt{credentials:\ "omit"}
+et n'utilise pas de cookie de session. On désactive CSRF pour permettre
+ses mutations JSON. \textbf{Une API sans état ou utilisant HTTP Basic
+n'est pas automatiquement à l'abri de CSRF} : le navigateur peut envoyer
+automatiquement des identifiants Basic dans d'autres configurations. Si
+l'authentification ou le client change, il faut réévaluer cette
+politique. Voir la
+\href{https://docs.spring.io/spring-security/reference/features/exploits/csrf.html}{documentation
+Spring Security sur CSRF}.
+
+Vérifiez avec Planora :
+
+\begin{itemize}
+\tightlist
+\item
+  Anonyme : les tâches sont refusées avec \texttt{401}.
+\item
+  Alice : création \texttt{201}, modification et clôture \texttt{200},
+  suppression \texttt{204} ; statistiques \texttt{403}.
+\item
+  Bob : gestion des tâches et statistiques autorisées.
+\item
+  Avec \texttt{curl}, \texttt{GET\ /api/public/info} fonctionne sans
+  identifiants.
+\end{itemize}
+
+La route confidentielle est encore absente : un compte valide reçoit
+\texttt{404}, tandis qu'un appel anonyme est bloqué par la sécurité avec
+\texttt{401}.
+
+Retirez \texttt{@Disabled} du test
+\texttt{exercice4LAccesPublicEtLesDroitsAdminSontRespectes}, puis lancez
+\texttt{mvn\ test}. Le test inclut une création de tâche authentifiée :
+oublier CSRF laisse cette opération en échec.
+
+\subsection{8. Exercice 5 --- Protéger une méthode (10
+min)}\label{exercice-5-protuxe9ger-une-muxe9thode-10-min}
+
+\textbf{Branche :} \texttt{Tp\_version5}. \textbf{Fichiers :}
+\texttt{controller/TaskController.java} et
+\texttt{config/SecurityConfig.java}.
+
+La route \texttt{GET\ /api/tasks/confidential} et son objet
+\texttt{ConfidentialProject} sont \textbf{déjà fournis}. Elle appelle
+\texttt{taskService.confidential()} et retourne le projet Orion, son
+client, un résumé et une note interne. Aucun endpoint métier n'est à
+créer.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Connectez-vous avec Alice et ouvrez Projet confidentiel : au début,
+  elle peut lire la note (\texttt{200}). La règle HTTP générale exige
+  seulement une authentification.
+\item
+  Activez
+  \texttt{@PreAuthorize("hasRole(\textquotesingle{}ADMIN\textquotesingle{})")}
+  sur la méthode \texttt{confidential()} de \texttt{TaskController}
+  (TODO 5.1).
+\item
+  Ajoutez \texttt{@EnableMethodSecurity} à \texttt{SecurityConfig} (TODO
+  5.2).
+\item
+  Redémarrez et vérifiez : anonyme \texttt{401}, Alice \texttt{403}, Bob
+  \texttt{200}.
+\end{enumerate}
+
+Ne créez pas de matcher HTTP spécifique pour cette route : l'exercice
+porte sur la sécurité des méthodes.
+\texttt{hasRole(\textquotesingle{}ADMIN\textquotesingle{})} vérifie
+l'autorité \texttt{ROLE\_ADMIN} créée par \texttt{.roles("ADMIN")}.
+
+Expliquez le rôle de \texttt{@EnableMethodSecurity}. Comparez cette
+protection avec les règles HTTP. Pourquoi les données restent-elles dans
+le service ?
+
+Retirez \texttt{@Disabled} du test
+\texttt{exercice5MethodeConfidentielleReserveeAuxAdmins}, puis lancez
+\texttt{mvn\ test}. Vérifiez que le CRUD et les statistiques
+fonctionnent toujours selon les règles de l'exercice 4.
+
+\subsection{9. Exercice 6 --- Vérifier le parcours final (5
+min)}\label{exercice-6-vuxe9rifier-le-parcours-final-5-min}
+
+\textbf{Branche :} \texttt{Tp\_version6}. La correction complète est
+fournie ; aucun TODO de sécurité à compléter.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{mvn}\NormalTok{ clean verify}
+\end{Highlighting}
+\end{Shaded}
+
+Le test d'intégration couvre l'accès public, les identifiants invalides,
+les accès aux statistiques et à la note, les mutations d'Alice,
+l'évolution des statistiques et la suppression d'une tâche inexistante.
+Les tests unitaires vérifient la logique métier. Tous les tests sont
+actifs en version 6.
+
+La matrice suivante suppose des données valides et un identifiant de
+tâche existant :
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}lrrr@{}}
+\toprule\noalign{}
+Opération & Anonyme & Alice \texttt{USER} & Bob \texttt{ADMIN} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{GET\ /api/public/info} & \texttt{200} & \texttt{200} &
+\texttt{200} \\
+\texttt{GET\ /api/tasks} & \texttt{401} & \texttt{200} & \texttt{200} \\
+\texttt{POST\ /api/tasks} & \texttt{401} & \texttt{201} &
+\texttt{201} \\
+\texttt{PUT\ /api/tasks/\{id\}} & \texttt{401} & \texttt{200} &
+\texttt{200} \\
+\texttt{PATCH\ /api/tasks/\{id\}/complete} & \texttt{401} & \texttt{200}
+& \texttt{200} \\
+\texttt{DELETE\ /api/tasks/\{id\}} & \texttt{401} & \texttt{204} &
+\texttt{204} \\
+\texttt{GET\ /api/admin/stats} & \texttt{401} & \texttt{403} &
+\texttt{200} \\
+\texttt{GET\ /api/tasks/confidential} & \texttt{401} & \texttt{403} &
+\texttt{200} \\
+\end{longtable}
+}
+
+Dans Planora, refaites un cycle complet de gestion des tâches avec
+Alice, puis vérifiez les statistiques et le projet confidentiel avec
+Bob. Recommencez ces accès avec Alice et sans compte. Utilisez curl ou
+l'onglet Réseau pour contrôler les statuts précis.
+
+\subsection{10. Aide et bilan}\label{aide-et-bilan}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Symptôme
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Vérification
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+API inaccessible & Spring doit écouter sur le port 8080 \\
+\texttt{401} & Identifiants absents ou invalides ; vérifier la branche
+et le compte disponible \\
+Mutation \texttt{403} en étapes 2 et 3 & CSRF par défaut ; comportement
+attendu sans jeton \\
+Mutation \texttt{403} après l'exercice 4 & Vérifier le TODO 4.6 et le
+redémarrage de Spring \\
+Statistiques \texttt{403} avec Alice après l'exercice 4 & Comportement
+attendu : rôle \texttt{ADMIN} requis \\
+Note \texttt{404} en branches 1 à 4 avec un compte autorisé & Route
+absente, fournie seulement à partir de la branche 5 \\
+Alice lit la note après l'exercice 5 & Vérifier \texttt{@PreAuthorize}
+et \texttt{@EnableMethodSecurity} \\
+Tests ignorés & Retirer \texttt{@Disabled} seulement après avoir terminé
+l'exercice correspondant \\
+Ancien comportement après un changement de branche & Arrêter puis
+relancer Spring et Vite \\
+\end{longtable}
+}
+
+\texttt{401} indique une authentification absente ou invalide.
+\texttt{403} indique un refus de sécurité : rôle insuffisant dans le
+parcours final, ou jeton CSRF absent aux étapes précédentes.
+\texttt{404} indique une route ou une tâche absente, lorsque la sécurité
+autorise l'appel.
+
+\textbf{Bilan à rendre :} fiche d'analyse, configurations des exercices,
+résultats des tests et observations dans Planora. Expliquez la
+distinction entre authentification et autorisation, l'intérêt de BCrypt,
+l'ordre des règles HTTP et l'activation de la sécurité des méthodes.
+
+HTTP Basic encode les identifiants en Base64 ; il ne les chiffre pas.
+Les comptes et données de ce TP sont fictifs et destinés au local. Cette
+démonstration n'est pas une configuration de production.
+
+\textbf{Ressources :} \texttt{ENONCE.md} pour l'exercice courant ;
+\texttt{docs/corrections/} pour les corrigés précédents ;
+\texttt{docs/ARCHITECTURE.md}, \texttt{docs/SCENARIOS\_DE\_TEST.md} et
+\texttt{docs/GUIDE\_HTTP.md} pour les détails.
+
+\end{document}
