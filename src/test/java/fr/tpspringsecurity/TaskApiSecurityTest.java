@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -46,5 +48,9 @@ class TaskApiSecurityTest {
                 .andExpect(status().isForbidden());
         mvc.perform(get("/api/admin/stats").with(httpBasic("bob", "bob123")))
                 .andExpect(status().isOk());
+        mvc.perform(post("/api/tasks").with(httpBasic("alice", "alice123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Nouvelle tâche\",\"status\":\"TODO\",\"priority\":\"MEDIUM\"}"))
+                .andExpect(status().isCreated());
     }
 }

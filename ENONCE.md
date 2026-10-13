@@ -9,7 +9,8 @@ Dans src/main/java/fr/tpspringsecurity/config/SecurityConfig.java, ajoutez un be
 1. autorise GET /api/public/info avec permitAll() ;
 2. réserve GET /api/admin/** au rôle ADMIN avec hasRole("ADMIN") ;
 3. exige un compte authentifié pour toutes les autres requêtes, notamment toutes les opérations sur /api/tasks ;
-4. active HTTP Basic et une session sans état adaptée à l’API.
+4. active HTTP Basic et une session sans état adaptée à l’API ;
+5. désactive CSRF pour cette API REST stateless, qui transmet l’authentification dans l’en-tête Authorization et n’utilise pas de cookie.
 
 Placez les règles précises avant anyRequest().authenticated().
 
@@ -20,7 +21,7 @@ Placez les règles précises avant anyRequest().authenticated().
 3. Connecté comme Bob, l’administrateur peut aussi ouvrir Statistiques.
 4. Ouvrez Projet confidentiel : cette route sera créée à l’exercice 5. Elle renvoie donc 404 pour un compte authentifié à cette étape.
 
-Vérifiez les réponses 200, 201, 204, 401 et 403. Une URL ne protège rien par elle-même ; les décisions sont prises par Spring Security.
+Vérifiez les réponses 200, 201, 204, 401 et 403. Si CSRF reste actif, Spring renvoie 403 aux requêtes de création, modification, clôture et suppression même avec Alice. Une URL ne protège rien par elle-même ; les décisions sont prises par Spring Security.
 
 Une fois le bean terminé, retirez @Disabled du test exercice4LAccesPublicEtLesDroitsAdminSontRespectes dans TaskApiSecurityTest.java et lancez mvn test.
 
