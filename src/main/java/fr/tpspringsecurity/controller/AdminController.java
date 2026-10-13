@@ -1,11 +1,12 @@
 package fr.tpspringsecurity.controller;
 
+import fr.tpspringsecurity.model.TaskStats;
 import fr.tpspringsecurity.service.StatisticsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Responsabilite : exposer les statistiques en HTTP. Le nom admin ne securise RIEN. */
+/** Expose les indicateurs d'administration calcules par le service. */
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -16,7 +17,7 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
-    public String stats() {
+    public TaskStats stats() {
         return statisticsService.getSummary();
     }
 }

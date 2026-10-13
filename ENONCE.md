@@ -1,18 +1,27 @@
-# Exercice 4 — Configurer les autorisations (10 minutes)
+# Exercice 4 — Définir les autorisations HTTP (10 min)
 
-Les deux utilisateurs Alice (USER) et Bob (ADMIN) fonctionnent déjà. Mais Alice peut encore lire les statistiques ADMIN !
+Alice (USER) et Bob (ADMIN) peuvent désormais s’authentifier et manipuler Planora. Pourtant, la configuration par défaut ne distingue pas leurs droits et ne rend pas les informations publiques accessibles anonymement.
 
-## Travail
+## Configurer SecurityFilterChain
 
-1. Ajoutez un Bean `SecurityFilterChain` dans `SecurityConfig`.
-2. Autorisez tout le monde sur `GET /api/public/info` avec `permitAll()`.
-3. Réservez `GET /api/admin/**` au rôle `ADMIN` avec `hasRole("ADMIN")`.
-4. Imposez une connexion sur toutes les autres requêtes avec `anyRequest().authenticated()`.
-5. Activez `httpBasic(withDefaults())`. Utilisez `SessionCreationPolicy.STATELESS` pour ce TP d'API HTTP Basic.
-6. Vérifiez 200, 401, 403 avec `curl` ou Postman.
+Dans src/main/java/fr/tpspringsecurity/config/SecurityConfig.java, ajoutez un bean SecurityFilterChain qui :
 
-**Conseil :** l'ordre des `requestMatchers` compte ; placez les règles spécifiques avant `anyRequest()`.
+1. autorise GET /api/public/info avec permitAll() ;
+2. réserve GET /api/admin/** au rôle ADMIN avec hasRole("ADMIN") ;
+3. exige un compte authentifié pour toutes les autres requêtes, notamment toutes les opérations sur /api/tasks ;
+4. active HTTP Basic et une session sans état adaptée à l’API.
 
-Les tests existants restent valides avant et après vos modifications. Lorsque vous avez terminé les TODO, retirez `@Disabled` du test `exercice4LAccesPublicEtLesDroitsAdminSontRespectes` dans `TaskApiSecurityTest.java`, puis exécutez `mvn test`. Vous pouvez également tester visuellement dans React.
+Placez les règles précises avant anyRequest().authenticated().
 
-Correction dans la branche `Tp_version5`.
+## Parcours de vérification
+
+1. Sans compte, Planora affiche l’information publique mais refuse la liste des tâches.
+2. Connectée comme Alice, l’étudiante peut créer, modifier et terminer des tâches ; Statistiques renvoie 403.
+3. Connecté comme Bob, l’administrateur peut aussi ouvrir Statistiques.
+4. Ouvrez Projet confidentiel : cette route sera créée à l’exercice 5. Elle renvoie donc 404 pour un compte authentifié à cette étape.
+
+Vérifiez les réponses 200, 201, 204, 401 et 403. Une URL ne protège rien par elle-même ; les décisions sont prises par Spring Security.
+
+Une fois le bean terminé, retirez @Disabled du test exercice4LAccesPublicEtLesDroitsAdminSontRespectes dans TaskApiSecurityTest.java et lancez mvn test.
+
+L’exercice suivant ajoute la ressource confidentielle et une règle au niveau d’une méthode Java.
