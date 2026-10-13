@@ -1,30 +1,21 @@
-# Exercice 1 — Identifier les failles (10 minutes)
+# Exercice 1 — Observer une faille de securite (10 min)
 
-## Contexte
+Cette etape est **une analyse, sans modification de code**.
 
-Vous rejoignez une équipe qui a développé une petite API REST de gestion de tâches. Le développeur précédent n'a mis **aucune protection** sur les routes HTTP. Votre mission est de vérifier les accès avant d'ajouter Spring Security.
+## TODO 1.1 — Constater les trois comportements
 
-## Travail à faire
+1. Lancez `mvn spring-boot:run`.
+2. Sans `Authorization`, testez `GET /api/public/info`, `GET /api/tasks` et `GET /api/admin/stats`.
+3. Reportez codes HTTP et reponses dans [la feuille a completer](docs/reponses/EXERCICE_1_A_COMPLETER.md).
 
-1. Lancez le projet avec `mvn spring-boot:run`.
-2. Sans compte utilisateur et sans en-tête `Authorization`, appelez les trois routes :
-   - `GET /api/public/info`
-   - `GET /api/tasks`
-   - `GET /api/admin/stats`
-3. Notez le code HTTP obtenu et le contenu de chaque réponse.
-4. Ouvrez `src/main/java/fr/tpspringsecurity/controller/TaskController.java`.
-5. Répondez par écrit aux questions suivantes :
-   - Un visiteur anonyme peut-il lire la liste des tâches ?
-   - Peut-il lire les statistiques réservées à l'administrateur ?
-   - Quelles routes devraient être publiques, authentifiées ou réservées aux administrateurs ?
-   - Quelle différence faites-vous entre **authentification** et **autorisation** ?
+## TODO 1.2 — Identifier les responsabilites
 
-## Attendu
+1. Lisez `controller/PublicController.java`, `controller/TaskController.java` et `controller/AdminController.java`.
+2. Regardez `service/TaskService.java` et `service/StatisticsService.java`.
+3. Expliquez pourquoi une URL contenant `admin` n'empeche pas un visiteur anonyme de lire les statistiques.
 
-Un tableau de trois lignes indiquant le statut observé, l'accès attendu et la faille détectée.
+## TODO 1.3 — Proposer les acces attendus
 
-**Ne modifiez pas encore le code.** L'objectif est de constater le problème. La correction théorique apparaît à partir de `Tp_version2` dans `docs/corrections/EXERCICE_1.md`.
+Pour chaque route, indiquez si elle doit etre publique, ouverte aux utilisateurs connectes ou reservee aux ADMIN. Expliquez la difference entre authentification et autorisation.
 
-## Indice
-
-Une route située sous `/admin` n'est **pas** protégée automatiquement par son nom.
+**Ne modifiez pas les fichiers Java.** La correction d'analyse sera dans `Tp_version2/docs/corrections/EXERCICE_1.md`.
