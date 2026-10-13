@@ -23,3 +23,5 @@ Le `PasswordEncoder` encode le mot de passe avant de l'enregistrer en mémoire e
 **Attention :** les utilisateurs sont en mémoire, sans persistance. Les mots de passe sont fixes et volontairement faibles uniquement pour le TP ; en production : base de données, gestion des secrets, politique de mots de passe et HTTPS.
 
 À ce stade, les deux utilisateurs sont authentifiables mais **leurs rôles ne sont pas encore utilisés pour les routes**.
+
+Les lectures GET sont autorisées pour Alice et Bob, y compris les statistiques. Les mutations sans jeton CSRF restent refusées avec 403 jusqu’à l’exercice 4.

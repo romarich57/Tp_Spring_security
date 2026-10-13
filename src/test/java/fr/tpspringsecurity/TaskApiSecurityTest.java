@@ -42,7 +42,7 @@ class TaskApiSecurityTest {
                 .andExpect(status().isOk());
     }
 
-    @Disabled("TODO exercice 5 : implementez le controller et @EnableMethodSecurity, puis retirez @Disabled.")
+    @Disabled("TODO exercice 5 : activez @PreAuthorize et @EnableMethodSecurity, puis retirez @Disabled.")
     @Test
     void exercice5MethodeConfidentielleReserveeAuxAdmins() throws Exception {
         mvc.perform(get("/api/tasks/confidential")).andExpect(status().isUnauthorized());

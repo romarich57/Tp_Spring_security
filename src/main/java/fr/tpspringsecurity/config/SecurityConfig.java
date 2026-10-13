@@ -11,7 +11,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-// TODO 5.3 : ajouter @EnableMethodSecurity pour rendre @PreAuthorize actif.
+// TODO 5.2 : ajouter @EnableMethodSecurity pour rendre @PreAuthorize actif.
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

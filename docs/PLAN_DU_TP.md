@@ -41,9 +41,9 @@ Les tâches, leur état et leur priorité sont stockés en mémoire. Un redémar
 
 ## Comptes de démonstration
 
-- À la version 2, Spring génère un compte temporaire et affiche son mot de passe dans la console.
-- À partir de la version 3, Alice utilise alice / alice123 avec le rôle USER.
-- À partir de la version 3, Bob utilise bob / bob123 avec le rôle ADMIN.
+- Après l’ajout de la dépendance en exercice 2, Spring génère un compte temporaire et affiche son mot de passe dans la console.
+- Après l’exercice 3, et dès le début des branches 4 à 6, Alice utilise alice / alice123 avec le rôle USER.
+- Après l’exercice 3, et dès le début des branches 4 à 6, Bob utilise bob / bob123 avec le rôle ADMIN.
 
 Ces identifiants sont fictifs et destinés uniquement à l’exécution locale du TP.
 
@@ -58,4 +58,4 @@ Ces identifiants sont fictifs et destinés uniquement à l’exécution locale d
 
 Les scénarios détaillés avant et après chaque exercice sont dans SCENARIOS_DE_TEST.md.
 
-À l’exercice 4, désactivez CSRF dans SecurityFilterChain : le client est une API stateless qui transmet HTTP Basic dans l’en-tête Authorization et n’utilise pas de cookie de session. Cela permet aux opérations POST, PUT, PATCH et DELETE authentifiées de fonctionner.
+À l’exercice 4, désactivez CSRF dans SecurityFilterChain pour le client local fourni, qui transmet explicitement Authorization et utilise credentials: "omit". Cela permet les mutations authentifiées. STATELESS et HTTP Basic ne garantissent pas, à eux seuls, une protection contre CSRF. Avant cette correction, les mutations sans jeton renvoient 403 avec ou sans compte. La route confidentielle est déjà fournie au début de la branche 5 : il reste à la protéger.

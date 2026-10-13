@@ -7,6 +7,7 @@
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.GET, "/api/public/info").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/admin/**").hasRole("ADMIN")
@@ -27,4 +28,4 @@ Importer `HttpMethod`, `SessionCreationPolicy`, `SecurityFilterChain` et `withDe
 
 HTTP Basic : une identité absente ou invalide produit **401**, tandis qu'Alice authentifiée n'a pas la permission ADMIN (**403**).
 
-`SessionCreationPolicy.STATELESS` empêche d'utiliser une session HTTP pour garder l'état de connexion ; chaque requête fournit ses identifiants. Les routes étudiées sont des GET : la protection CSRF reste activée par défaut pour les autres méthodes. L'application est une démonstration locale ; HTTP Basic en production exige HTTPS.
+`SessionCreationPolicy.STATELESS` empêche d'utiliser une session HTTP pour garder l'état de connexion ; chaque requête fournit ses identifiants. La configuration désactive CSRF pour le client local fourni, qui envoie explicitement Authorization avec credentials: "omit". Les mutations fonctionnent alors avec un compte valide : POST 201, PUT/PATCH 200, DELETE 204. HTTP Basic ou STATELESS ne garantissent pas à eux seuls l’absence de risque CSRF ; ce choix doit être réévalué si le client ou l’authentification change. L'application est une démonstration locale ; HTTP Basic en production exige HTTPS.
