@@ -1,5 +1,7 @@
 # Correction de l'exercice 5 — @PreAuthorize
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Dans `SecurityConfig.java` :
 
 ```java

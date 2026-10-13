@@ -1,5 +1,7 @@
 # Scénarios de l’application
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 La même interface Planora consomme les vraies routes métier sur les six branches. Chaque branche est le **point de départ** de son exercice ; la branche 6 est la solution finale.
 
 ## Fonctionnalités métier

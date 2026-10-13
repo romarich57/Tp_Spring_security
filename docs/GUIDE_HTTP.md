@@ -1,5 +1,7 @@
 # Tester l’API métier
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 Planora appelle ces mêmes routes. Pour observer les requêtes indépendamment de l’interface, utilisez requests.http, curl, Postman ou Insomnia.
 
 ## Lire et modifier les tâches

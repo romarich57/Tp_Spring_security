@@ -1,5 +1,7 @@
 # Correction de l'exercice 4 — Contrôle des accès HTTP
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 `Tp_version5` implémente la règle finale au moyen du Bean `SecurityFilterChain`.
 
 ```java

@@ -1,5 +1,7 @@
 # TP corrigé — Validation du parcours complet
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 La branche Tp_version6 contient le gestionnaire de tâches Planora et la configuration Spring Security finale. Les tests d’intégration exercent les vraies routes de l’application, y compris ses mutations CRUD.
 
 ## Politique finale
