@@ -74,3 +74,18 @@ Un clic dans la navigation React ouvre le code GitHub, mais **ne change pas votr
 - Le témoin « Mode local » ne certifie pas que Spring Boot est démarré : les appels de test le déterminent réellement.
 
 Tableaux de référence : [docs/SCENARIOS_DE_TEST.md](../docs/SCENARIOS_DE_TEST.md).
+
+## Conserver votre code avant de changer de branche
+
+Après avoir corrigé un exercice, **enregistrez votre travail** avant `git switch`, sinon Git peut refuser le changement de branche à cause des fichiers modifiés.
+
+```bash
+# Depuis la racine du dépôt, sauvegarder votre résolution sur la branche actuelle
+git add -A
+git commit -m "solution personnelle de l'exercice"
+
+# Ensuite, arrêter les deux serveurs avec Ctrl+C puis passer à l'étape suivante
+git switch Tp_version2    # adapter le numero à l'exercice suivant
+```
+
+Si vous ne souhaitez pas créer de commit, vous pouvez utiliser `git stash push -u -m "sauvegarde TP"` avant le changement de branche. Une fois sur la branche suivante, **ne réappliquez pas automatiquement le stash** : il représente le code de l'exercice précédent.

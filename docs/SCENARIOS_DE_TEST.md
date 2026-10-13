@@ -50,3 +50,9 @@ Le **lien GitHub** d'une étape n'est pas un changement de branche local. **Red�
 ## Limites volontaires du TP
 
 Les comptes sont fictifs, codés en dur et stockés en mémoire. HTTP Basic est utilisé exclusivement en local pour illustrer l'authentification et les rôles. Pas de JWT, de base de données ni de formulaire de connexion sécurisé de production. Toutes les routes métier testées sont des GET.
+
+## Attention : sauvegarde Git des exercices
+
+Pour passer d'une branche à l'autre, sauvegardez les modifications de votre exercice par un commit local, ou avec `git stash push -u -m "TP"`. Sinon Git peut bloquer le changement de branche lorsqu'un fichier corrigé entre en conflit avec la version suivante.
+
+Un commit local ne publie pas automatiquement votre travail sur GitHub et ne modifie aucune autre branche.
