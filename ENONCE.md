@@ -1,5 +1,7 @@
 # Exercice 2 — Activer Spring Security (10 min)
 
+**TP réalisé par :** Heitz Romaric, Khiri Amine, Benali Syrine, Van-Rossen-Martinez Alessandra et Denocq Elio.
+
 **Branche :** `Tp_version2`
 
 **Fichier à modifier :** `pom.xml` uniquement.
