@@ -31,4 +31,9 @@ public class SecurityConfig {
 
         return new InMemoryUserDetailsManager(alice, bob);
     }
+    // TODO EXERCICE 4.1 : Declarer un Bean SecurityFilterChain(HttpSecurity http).
+    // TODO EXERCICE 4.2 : permitAll() sur GET /api/public/info.
+    // TODO EXERCICE 4.3 : hasRole("ADMIN") sur GET /api/admin/**.
+    // TODO EXERCICE 4.4 : authenticated() pour toutes les autres routes.
+    // TODO EXERCICE 4.5 : HTTP Basic et sessions STATELESS.
 }
