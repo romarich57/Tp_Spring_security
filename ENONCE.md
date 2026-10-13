@@ -4,7 +4,7 @@ Les règles HTTP sont déjà actives. Il reste à protéger une fonctionnalité 
 
 ## À faire
 
-1. Dans `TaskController.java`, créez `GET /api/tasks/confidential`, qui retourne la chaîne `Projet confidentiel`.
+1. Dans `TaskController.java`, créez `GET /api/tasks/confidential`. Comme le controller declare deja `@RequestMapping("/api/tasks")`, utilisez **`@GetMapping("/confidential")`**, pas le chemin complet. La methode retourne **`taskService.confidential()`** (service metier deja fourni), et ne contient pas elle-meme les donnees.
 2. Protégez **uniquement cette méthode** avec `@PreAuthorize("hasRole('ADMIN')")`.
 3. Ajoutez `@EnableMethodSecurity` dans la configuration Spring Security.
 4. Testez sans identifiants, avec Alice et avec Bob : attendez respectivement **401**, **403** et **200**.
