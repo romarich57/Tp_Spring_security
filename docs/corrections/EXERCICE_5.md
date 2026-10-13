@@ -7,17 +7,17 @@ Dans `SecurityConfig.java` :
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    // ... Beans PasswordEncoder, UserDetailsService et SecurityFilterChain
+    // ... Bean SecurityFilterChain (les comptes sont dans UserConfig)
 }
 ```
 
 Dans `TaskController.java` :
 
 ```java
-@GetMapping("/tasks/confidential")
+@GetMapping("/confidential")
 @PreAuthorize("hasRole('ADMIN')")
 public String confidential() {
-    return "Projet confidentiel";
+    return taskService.confidential();
 }
 ```
 
