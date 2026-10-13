@@ -11,12 +11,12 @@ public class SecurityConfig {
 }
 ```
 
-Dans `TaskController.java` :
+La route et les données sont déjà fournies en branche 5. Au début, Alice peut les lire. Dans `TaskController.java`, activez la protection de la méthode existante :
 
 ```java
 @GetMapping("/confidential")
 @PreAuthorize("hasRole('ADMIN')")
-public String confidential() {
+public ConfidentialProject confidential() {
     return taskService.confidential();
 }
 ```
