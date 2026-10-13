@@ -1,32 +1,36 @@
-# Exercice 1 — Auditer une API métier ouverte (10 min)
+# Exercice 1 — Enquête sur le contrôle d’accès (10 min)
 
-Planora est un gestionnaire de tâches relié à une API Spring Boot. La fonctionnalité métier est déjà prête : dans cette étape, observez qui peut l’utiliser avant l’ajout de Spring Security.
+Cette branche est le point de départ de l’exercice : l’API métier fonctionne, mais aucune configuration Spring Security ne s’applique encore. N’apportez pas de correction pour le moment. Il vous faut recueillir des preuves, identifier les accès inattendus et expliquer le risque.
 
-## 1. Lancer et parcourir l’application
+## Piste de recherche : OWASP Top 10, A01:2025
 
-1. Démarrez Spring avec mvn spring-boot:run.
-2. Dans un autre terminal, démarrez React : cd frontend, npm install, npm run dev.
-3. Ouvrez http://localhost:5173 et manipulez une tâche : créez-la, modifiez-la, terminez-la et supprimez-la.
-4. Ouvrez Statistiques et notez les valeurs renvoyées par l’API.
+Lisez la catégorie [A01 — Broken Access Control](https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/) de l’OWASP Top 10:2025. Elle concerne les applications qui autorisent une personne à agir hors des permissions prévues. L’OWASP cite notamment les API dont les opérations POST, PUT ou DELETE manquent de contrôle d’accès, ainsi que l’accès direct à une URL privilégiée. Cherchez dans Planora si vous trouvez des situations de ce type et démontrez-les.
 
-## 2. Constater les accès sans compte
+## Investigation
 
-Sans renseigner d’identifiants, utilisez l’application et les requêtes de requests.http. Vérifiez que vous pouvez :
+1. Démarrez l’API (`mvn spring-boot:run`) et l’interface React (`cd frontend && npm install && npm run dev`).
+2. Restez déconnecté. Dans Planora, lisez les tâches, créez-en une, modifiez-la, terminez-la, supprimez-la et ouvrez les statistiques.
+3. Ouvrez les outils développeur du navigateur, onglet **Réseau**, pour examiner les requêtes et leurs statuts. Les contrôles visuels de React ne prouvent pas que l’API protège ses routes.
+4. Testez aussi les routes de l’API directement, sans identifiants :
 
-- lire GET /api/tasks ;
-- créer, modifier, terminer et supprimer une tâche ;
-- lire GET /api/admin/stats ;
-- lire GET /api/public/info.
+```bash
+curl -i http://localhost:8080/api/tasks
+curl -i http://localhost:8080/api/admin/stats
+curl -i http://localhost:8080/api/public/info
+```
 
-Reportez les réponses dans docs/reponses/EXERCICE_1_A_COMPLETER.md.
+La fiche d’enquête à remplir se trouve dans le PDF `Tp.pdf`, à la section **4. Exercice 1**. Complétez le tableau à partir de vos observations, puis répondez aux questions en argumentant avec des requêtes précises. Pour tester PUT, PATCH et DELETE, utilisez un identifiant existant et supprimez uniquement la tâche créée pendant l’exercice.
 
-## 3. Analyser les responsabilités
+## Lire le backend
 
-Lisez TaskController, TaskService, AdminController et StatisticsService. Expliquez :
+Examinez `TaskController`, `AdminController`, `TaskService` et `StatisticsService`. Repérez les routes et cherchez où le serveur vérifie l’identité et les permissions.
 
-1. quelles opérations métier sont disponibles ;
-2. pourquoi le nom /api/admin/stats n’empêche pas un visiteur de lire les chiffres ;
-3. quelles routes devraient rester publiques, exiger une connexion ou demander le rôle ADMIN ;
-4. la différence entre authentification et autorisation.
+Votre conclusion doit :
 
-Cette première étape est une analyse : ne modifiez pas le backend. L’exercice suivant ajoute Spring Security. React est le client métier du TP et reste identique dans toutes les branches.
+- proposer une politique d’accès pour une personne anonyme, un membre de l’équipe et un administrateur ;
+- expliquer au moins deux écarts entre cette politique et les résultats observés ;
+- décrire le risque concret de ces écarts ;
+- distinguer authentification et autorisation ;
+- expliquer pourquoi le contrôle doit être appliqué dans le backend.
+
+Conservez la fiche : elle vous servira à constater les changements après l’ajout de Spring Security. L’interface React reste le client métier fourni pendant tout le TP.
