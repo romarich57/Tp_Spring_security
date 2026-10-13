@@ -32,4 +32,7 @@ public class TaskController {
     public String stats() {
         return "Chiffre d'affaires fictif : 150000 EUR";
     }
+    // TODO EXERCICE 5.1 : Ajouter GET /api/tasks/confidential.
+    // TODO EXERCICE 5.2 : Proteger cette methode avec @PreAuthorize("hasRole('ADMIN')").
+    // NOTE : ce endpoint est volontairement absent jusqu'a votre implementation.
 }
