@@ -2,6 +2,8 @@
 
 Un atelier de **60 minutes de travaux pratiques** conçu pour accompagner **30 minutes d'explications** sur Spring Security : authentification, autorisations HTTP, rôles, BCrypt et `@PreAuthorize`.
 
+**Support du TP : [PDF](Tp.pdf) · [source LaTeX](Tp.tex) · [source Markdown](Tp.md).** Les fichiers du sujet sont centralisés dans cette branche `main`.
+
 **Commencer ici : [Tp_version1 — premier exercice](https://github.com/romarich57/Tp_Spring_security/tree/Tp_version1).**
 
 Chaque branche est un **point de reprise autonome**. Elle contient les corrections précédentes, les consignes de l'exercice en cours (`ENONCE.md`) et une interface **React interactive** pour tester les vraies réponses de l'API.
