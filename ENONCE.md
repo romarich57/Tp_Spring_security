@@ -1,6 +1,6 @@
 # Exercice 4 — Définir les autorisations HTTP (10 min)
 
-Alice (USER) et Bob (ADMIN) peuvent désormais s’authentifier et manipuler Planora. Pourtant, la configuration par défaut ne distingue pas leurs droits et ne rend pas les informations publiques accessibles anonymement.
+Alice (USER) et Bob (ADMIN) peuvent désormais s’authentifier et consulter Planora ; les mutations restent bloquées par CSRF. Pourtant, la configuration par défaut ne distingue pas leurs droits et ne rend pas les informations publiques accessibles anonymement.
 
 ## Configurer SecurityFilterChain
 
@@ -16,7 +16,7 @@ Placez les règles précises avant anyRequest().authenticated().
 
 ## Parcours de vérification
 
-1. Sans compte, Planora affiche l’information publique mais refuse la liste des tâches.
+1. Sans compte, Planora refuse la liste des tâches. Vérifiez l’information publique avec curl : aucun écran React ne l’appelle.
 2. Connectée comme Alice, l’étudiante peut créer, modifier et terminer des tâches ; Statistiques renvoie 403.
 3. Connecté comme Bob, l’administrateur peut aussi ouvrir Statistiques.
 4. Ouvrez Projet confidentiel : cette route sera créée à l’exercice 5. Elle renvoie donc 404 pour un compte authentifié à cette étape.

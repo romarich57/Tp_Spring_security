@@ -12,7 +12,7 @@ Dans deux terminaux, depuis la racine du dépôt :
     npm install
     npm run dev
 
-Ouvrez http://localhost:5173. Prérequis : Java 17+ et Node.js 20.19+.
+Ouvrez http://localhost:5173. Prérequis : Java 17+ et Node.js 20.19+ ou 22.12+.
 
 Vite relaie les appels /api vers Spring Boot sur localhost:8080. L’interface et le backend se servent donc de la même origine dans le navigateur.
 
@@ -32,12 +32,12 @@ Les tâches sont conservées en mémoire par Spring. Elles sont réinitialisées
 
 Le formulaire transmet le nom et le mot de passe en HTTP Basic à chaque requête et les conserve uniquement dans l’état React. Ils ne sont écrits ni dans un cookie, ni dans localStorage ou sessionStorage. Le bouton de déconnexion efface l’état mémoire.
 
-- Version 2 : utilisez user et le mot de passe temporaire affiché par Spring Boot.
-- Versions 3 à 6 : Alice (alice / alice123) a le rôle USER ; Bob (bob / bob123) a le rôle ADMIN.
+- Après l’ajout de Spring Security en exercice 2 : utilisez user et le mot de passe temporaire affiché par Spring Boot.
+- Après avoir complété UserConfig en exercice 3, et dès le début des branches 4 à 6 : Alice (alice / alice123) a le rôle USER ; Bob (bob / bob123) a le rôle ADMIN.
 
-Les contrôles d’accès restent exclusivement dans Spring Security. L’interface affiche les réponses du serveur, dont 401 pour une authentification absente ou invalide et 403 quand le rôle ne suffit pas. En version 1, les identifiants ne sont pas encore vérifiés puisque l’API est ouverte.
+Les contrôles d’accès restent exclusivement dans Spring Security. L’interface affiche les réponses du serveur, dont 401 pour une authentification absente ou invalide et 403 pour un refus de sécurité, notamment un rôle insuffisant ou, avant l’exercice 4, un jeton CSRF absent. En version 1, les identifiants ne sont pas encore vérifiés puisque l’API est ouverte.
 
-À partir de l’exercice 4, la chaîne de sécurité est sans état et désactive la protection CSRF fondée sur les cookies afin que les mutations JSON authentifiées fonctionnent avec ce client HTTP Basic.
+Après l’exercice 4, la chaîne est sans état et désactive CSRF pour le client fourni, qui envoie explicitement Authorization avec credentials: "omit". C’est un choix du TP local : HTTP Basic ou STATELESS ne suppriment pas à eux seuls le risque CSRF. Avant cette correction, les mutations sans jeton répondent 403 même avec un compte valide.
 
 ## Parcours des branches
 
@@ -56,4 +56,4 @@ Après git switch, arrêtez puis relancez Spring Boot afin que la JVM charge le 
 
 ## Contrat de tâche
 
-Une tâche contient id, title, description, status (TODO, IN_PROGRESS, DONE), priority (LOW, MEDIUM, HIGH), dueDate et assignee. Pour créer ou modifier une tâche, le formulaire envoie ces champs (les valeurs d’assignation absentes sont conservées par le serveur lors d’une modification).
+Une tâche contient id, title, description, status (TODO, IN_PROGRESS, DONE), priority (LOW, MEDIUM, HIGH), dueDate et assignee. Le formulaire envoie title, description, status, priority et dueDate. L’assignation est affichée mais non éditable dans React ; le serveur conserve assignee si ce champ est absent lors d’une modification. L’API permet aussi de le fournir directement. L’information publique se consulte avec curl : aucun écran Planora ne l’appelle.

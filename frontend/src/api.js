@@ -33,8 +33,8 @@ export async function apiRequest(path, { method = "GET", body, credentials } = {
 export function getErrorMessage(result) {
   if (result.status === 0) return result.data;
   if (result.status === 401) return "HTTP 401 — authentification requise ou identifiants incorrects.";
-  if (result.status === 403) return "HTTP 403 — votre compte ne possède pas le rôle nécessaire.";
-  if (result.status === 404) return "HTTP 404 — cette ressource n’existe pas sur cette version du backend.";
+  if (result.status === 403) return "HTTP 403 — accès refusé par la politique de sécurité du serveur.";
+  if (result.status === 404) return "HTTP 404 — cette tâche ou cette route n’existe pas.";
   if (result.status === 400) return "HTTP 400 — vérifiez les informations saisies.";
   const detail = typeof result.data === "string" ? result.data : result.data?.message;
   return "HTTP " + result.status + (detail ? " — " + detail : " — la requête a échoué.");
