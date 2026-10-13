@@ -27,6 +27,8 @@ Les tâches sont conservées en mémoire et réinitialisées au redémarrage de 
 
 En version 2, Spring Security protège toutes les routes par défaut : une fois la dépendance ajoutée, même l’information publique demande une authentification jusqu’à l’exercice 4.
 
+En versions 2 et 3, les requêtes GET fonctionnent avec une identité valide, mais la protection CSRF par défaut peut refuser les mutations HTTP Basic avec 403. L’exercice 4 désactive CSRF pour cette API stateless, puis garde l’authentification et les rôles pour contrôler les accès.
+
 ## Matrice finale
 
 | Route | Anonyme | Alice USER | Bob ADMIN |
