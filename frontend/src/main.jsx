@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Activity, ArrowDownUp, ArrowRight, BarChart3, CalendarDays, Check, CheckCircle2, ChevronDown, CircleHelp, ClipboardList, Clock3, LockKeyhole, LogIn, LogOut, Menu, MoreHorizontal, Plus, Search, ShieldCheck, SlidersHorizontal, Sparkles, Trash2, X, XCircle } from "lucide-react";
 import { apiRequest, getErrorMessage } from "./api.js";
@@ -19,6 +19,8 @@ function App() {
   const [stats, setStats] = useState(null);
   const [confidential, setConfidential] = useState(null);
   const [credentials, setCredentials] = useState({ username: "", password: "" });
+  const credentialsRef = useRef(credentials);
+  credentialsRef.current = credentials;
   const [identity, setIdentity] = useState(null);
   const [apiState, setApiState] = useState("checking");
   const [loginOpen, setLoginOpen] = useState(false);
@@ -30,10 +32,10 @@ function App() {
   const [message, setMessage] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const request = useCallback(async (path, options = {}) => {
-    const result = await apiRequest(path, { ...options, credentials: identity ? credentials : null });
+    const result = await apiRequest(path, { ...options, credentials: identity ? credentialsRef.current : null });
     setApiState(result.status === 0 ? "offline" : "online");
     return result;
-  }, [credentials, identity]);
+  }, [identity]);
   const loadTasks = useCallback(async () => {
     const result = await request("/api/tasks");
     if (!result.ok) throw new Error(getErrorMessage(result));
@@ -63,7 +65,7 @@ function App() {
       setLoading(false);
     }
   }, [loadConfidential, loadStats, loadTasks, page]);
-  useEffect(() => { refresh("tasks"); }, [loadTasks]);
+  useEffect(() => { refresh(page); }, [loadTasks]);
   const visibleTasks = useMemo(() => tasks.filter((task) => {
     const matchesFilter = filter === "ALL" || task.status === filter;
     const text = (task.title + " " + (task.description || "")).toLocaleLowerCase("fr");
@@ -77,29 +79,21 @@ function App() {
     setMenuOpen(false);
     refresh(nextPage);
   }
-  async function submitLogin(event) {
+  function submitLogin(event) {
     event.preventDefault();
     const loginCredentials = { ...credentials, username: credentials.username.trim() };
     setCredentials(loginCredentials);
     setIdentity(loginCredentials.username);
     setLoginOpen(false);
     setMessage({ tone: "info", text: "Identifiants enregistrés en mémoire. Le serveur vérifiera les droits à la prochaine requête." });
-    setLoading(true);
-    try {
-      const result = await apiRequest("/api/tasks", { credentials: loginCredentials });
-      setApiState(result.status === 0 ? "offline" : "online");
-      if (!result.ok) throw new Error(getErrorMessage(result));
-      setTasks(Array.isArray(result.data) ? result.data : []);
-      setMessage({ tone: "success", text: "Requête acceptée par Spring pour « " + credentials.username.trim() + " »." });
-    } catch (error) {
-      setMessage({ tone: "error", text: error.message });
-    } finally {
-      setLoading(false);
-    }
   }
   function logout() {
     setIdentity(null);
     setCredentials({ username: "", password: "" });
+    setTasks([]);
+    setStats(null);
+    setConfidential(null);
+    setPage("tasks");
     setMessage({ tone: "info", text: "Les identifiants ont été effacés de la mémoire du navigateur." });
   }
   async function saveTask(task) {
@@ -149,7 +143,7 @@ function App() {
         <button className={page === "stats" ? "active" : ""} onClick={() => navigate("stats")}><BarChart3 size={17} />Statistiques</button>
         <button className={page === "confidential" ? "active" : ""} onClick={() => navigate("confidential")}><LockKeyhole size={17} />Projet confidentiel</button>
       </nav>
-      <div className="sidebar-bottom"><div className="tip-card"><Sparkles size={17} /><b>Un pas à la fois</b><p>Terminez une tâche pour faire avancer le projet.</p></div><div className="profile-row"><span className="profile-avatar">{initials(identity || "Invité")}</span><span className="profile-text"><b>{identity || "Visiteur"}</b><small>{identity ? "Identifiants actifs" : "Non connecté"}</small></span><button className="icon-button profile-menu" aria-label={identity ? "Se déconnecter" : "Se connecter"} onClick={() => identity ? logout() : setLoginOpen(true)}>{identity ? <LogOut size={16} /> : <LogIn size={16} />}</button></div></div>
+      <div className="sidebar-bottom"><div className="tip-card"><Sparkles size={17} /><b>Un pas à la fois</b><p>Terminez une tâche pour faire avancer le projet.</p></div><div className="profile-row"><span className="profile-avatar">{initials(identity || "Invité")}</span><span className="profile-text"><b>{identity || "Visiteur"}</b><small>{identity ? "Identifiants saisis" : "Non connecté"}</small></span><button className="icon-button profile-menu" aria-label={identity ? "Se déconnecter" : "Se connecter"} onClick={() => identity ? logout() : setLoginOpen(true)}>{identity ? <LogOut size={16} /> : <LogIn size={16} />}</button></div></div>
     </aside>
     <main className="main-content">
       <header className="topbar"><button className="mobile-menu icon-button" aria-label="Ouvrir le menu" onClick={() => setMenuOpen(!menuOpen)}><Menu size={19} /></button><div className="breadcrumbs">Novalabs <span>/</span> <b>{eyebrow}</b></div><div className="topbar-actions"><span className={"api-status " + (apiState === "offline" ? "api-offline" : "")}><i />{apiState === "offline" ? "API inaccessible" : apiState === "checking" ? "Connexion API" : "API Spring"}</span>{identity ? <button className="user-chip" onClick={logout}><span>{initials(identity)}</span>{identity}<LogOut size={14} /></button> : <button className="button button-secondary login-button" onClick={() => setLoginOpen(true)}><LogIn size={16} />Connexion</button>}</div></header>
