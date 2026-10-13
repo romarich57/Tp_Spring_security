@@ -394,47 +394,179 @@ aussi mettre vos changements de côté avec
 \texttt{git\ stash\ push\ -m\ "Mon\ exercice"} ; ne réappliquez pas
 automatiquement ce stash sur la branche suivante.
 
-\subsection{4. Exercice 1 --- Auditer les accès ouverts (10
-min)}\label{exercice-1-auditer-les-accuxe8s-ouverts-10-min}
+\subsection{4. Exercice 1 --- Enquête : contrôle d'accès cassé (10
+min)}\label{exercice-1-enquuxeate-contruxf4le-daccuxe8s-cassuxe9-10-min}
 
-\textbf{Branche :} \texttt{Tp\_version1}. \textbf{Livrable :}
-\texttt{docs/reponses/EXERCICE\_1\_A\_COMPLETER.md}. Aucun changement
-Java.
+\textbf{Branche :} \texttt{Tp\_version1}. Dans cette première étape, ne
+corrigez pas le code : votre objectif est d'observer, de démontrer et
+d'expliquer.
+
+\subsubsection{Point de départ : OWASP Top
+10}\label{point-de-duxe9part-owasp-top-10}
+
+L'\href{https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/}{OWASP
+Top 10:2025, A01 --- Broken Access Control} décrit les situations où une
+application laisse quelqu'un agir au-delà des permissions prévues. Parmi
+les exemples cités : une API qui n'applique pas de contrôle aux
+opérations \texttt{POST}, \texttt{PUT} ou \texttt{DELETE}, ou un accès à
+une fonction privilégiée en appelant directement son URL. Dans cet
+exercice, recherchez des indices de cette catégorie dans Planora. Vous
+devrez établir vous-même quels accès sont problématiques et proposer les
+règles à appliquer.
+
+\subsubsection{Mener l'enquête}\label{mener-lenquuxeate}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Sans saisir d'identifiants, consultez les tâches.
+  Lancez Spring Boot et Planora. Restez \textbf{déconnecté}.
 \item
-  Créez une tâche, modifiez-la, terminez-la et supprimez-la.
+  Dans \textbf{Mes tâches}, consultez les tâches, puis créez-en une,
+  modifiez-la, terminez-la et supprimez-la. Notez ce que l'interface
+  vous laisse faire.
 \item
-  Ouvrez les statistiques et observez leur évolution après une création.
+  Ouvrez \textbf{Statistiques}. La navigation dans React est un indice à
+  relever, pas une preuve suffisante du contrôle d'accès.
 \item
-  Vérifiez également l'information publique :
+  Vérifiez les requêtes directement contre l'API : observez les appels
+  dans l'onglet \textbf{Réseau} du navigateur ou utilisez \texttt{curl}.
+  Testez les routes listées dans la fiche ci-dessous \textbf{sans
+  identifiants}. Pour les opérations de modification, utilisez un
+  identifiant de tâche existant ; supprimez uniquement la tâche que vous
+  venez de créer.
+\item
+  Comparez ce que vous observez avec les permissions que vous estimez
+  nécessaires pour une application d'équipe. Pour vous guider, regardez
+  qui peut lire les tâches, modifier les données de l'équipe et
+  consulter des statistiques d'administration.
+\item
+  Lisez \texttt{TaskController}, \texttt{AdminController},
+  \texttt{TaskService} et \texttt{StatisticsService}. Repérez où sont
+  déclarées les routes et où se trouve (ou ne se trouve pas) une
+  vérification d'accès.
 \end{enumerate}
+
+L'interface publique \texttt{/api/public/info} peut être vérifiée avec
+\texttt{curl} ; elle n'a pas d'écran dédié dans Planora. Les réponses
+initiales de l'API sont observables ainsi :
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/public/info}
 \ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/tasks}
 \ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/admin/stats}
+\ExtensionTok{curl} \AttributeTok{{-}i}\NormalTok{ http://localhost:8080/api/public/info}
 \end{Highlighting}
 \end{Shaded}
 
-Reportez les statuts et les données observés dans la fiche de réponses.
-Pour le CRUD, relevez aussi \texttt{201} à la création et \texttt{204} à
-la suppression.
+Ne vous contentez pas de dire qu'une opération « fonctionne » : gardez
+le statut HTTP, le résultat visible et l'action réalisée comme éléments
+de preuve.
 
-Lisez \texttt{TaskController}, \texttt{TaskService},
-\texttt{AdminController} et \texttt{StatisticsService}. Expliquez
-pourquoi un visiteur peut modifier les données, pourquoi
-\texttt{/admin/} ne protège rien à lui seul et quelles opérations
-doivent devenir publiques, authentifiées ou réservées à \texttt{ADMIN}.
-Définissez authentification et autorisation.
+\subsubsection{Fiche d'observation à
+compléter}\label{fiche-dobservation-uxe0-compluxe9ter}
 
-\textbf{Résultat attendu :} toutes les opérations métier existantes sont
-ouvertes. La correction de l'analyse est disponible sur la branche 2.
+La fiche ci-dessous fait partie de ce support. Complétez-la dans le PDF
+(ou imprimez ces pages). Pour chaque requête, notez ce que \textbf{vous}
+avez observé sans vous connecter. Si une réponse diffère de ce que vous
+attendiez, expliquez pourquoi cela vous semble important.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Requête testée sans connexion
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Accessible ?
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Statut HTTP
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Résultat ou effet observé
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{GET\ /api/tasks} & \_\_\_\_\_\_\_\_\_\_ & \_\_\_\_\_\_ &
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ \\
+\texttt{POST\ /api/tasks} & \_\_\_\_\_\_\_\_\_\_ & \_\_\_\_\_\_ &
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ \\
+\texttt{PUT\ /api/tasks/\{id\}} & \_\_\_\_\_\_\_\_\_\_ & \_\_\_\_\_\_ &
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ \\
+\texttt{PATCH\ /api/tasks/\{id\}/complete} & \_\_\_\_\_\_\_\_\_\_ &
+\_\_\_\_\_\_ &
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ \\
+\texttt{DELETE\ /api/tasks/\{id\}} & \_\_\_\_\_\_\_\_\_\_ & \_\_\_\_\_\_
+&
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ \\
+\texttt{GET\ /api/admin/stats} & \_\_\_\_\_\_\_\_\_\_ & \_\_\_\_\_\_ &
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ \\
+\end{longtable}
+}
+
+\textbf{1. Décrire les permissions.} Pour chacun des trois profils
+ci-dessous, indiquez les droits que l'application devrait accorder selon
+vous. Justifiez votre proposition.
+
+\begin{itemize}
+\tightlist
+\item
+  Une personne sans compte :
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\item
+  Un membre connecté de l'équipe :
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\item
+  Un administrateur :
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\end{itemize}
+
+\textbf{2. Relier les observations à OWASP A01.} Quelle différence
+avez-vous constatée entre les permissions que vous proposez et les accès
+réellement possibles ? Donnez au moins deux exemples précis, avec la
+requête et son résultat.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{3. Expliquer le risque.} Quelles données pourraient être
+exposées ou quelles actions pourraient être effectuées par une personne
+qui ne devrait pas y avoir accès ?
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{4. Distinguer deux notions.} Avec vos mots, expliquez :
+
+\begin{itemize}
+\tightlist
+\item
+  Authentification :
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\item
+  Autorisation :
+  \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\end{itemize}
+
+\textbf{5. Localiser le contrôle.} Pourquoi cacher un bouton dans React
+ne suffirait-il pas à protéger la route correspondante ? Dans quelle
+partie du projet faudrait-il appliquer le contrôle d'accès ?
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{Conclusion ---} À partir de vos preuves, expliquez en quelques
+phrases pourquoi le cas observé correspond, ou non, à \textbf{A01:2025
+Broken Access Control}. La branche suivante introduira la première
+évolution du backend ; gardez votre fiche pour comparer les résultats
+après les exercices.
 
 \subsection{5. Exercice 2 --- Installer Spring Security (10
 min)}\label{exercice-2-installer-spring-security-10-min}
