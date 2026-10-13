@@ -1,5 +1,6 @@
 package fr.tpspringsecurity;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -41,4 +42,13 @@ class TaskApiSecurityTest {
                 .andExpect(status().isOk());
     }
 
+    @Disabled("TODO exercice 5 : implementez le controller et @EnableMethodSecurity, puis retirez @Disabled.")
+    @Test
+    void exercice5MethodeConfidentielleReserveeAuxAdmins() throws Exception {
+        mvc.perform(get("/api/tasks/confidential")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/tasks/confidential").with(httpBasic("alice", "alice123")))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/tasks/confidential").with(httpBasic("bob", "bob123")))
+                .andExpect(status().isOk());
+    }
 }
